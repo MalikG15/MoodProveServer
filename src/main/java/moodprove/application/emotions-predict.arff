@@ -1,0 +1,9 @@
+@relation qdb-weka.filters.unsupervised.attribute.Remove-R1
+
+@attribute temperature numeric
+@attribute sleephours numeric
+@attribute events numeric
+@attribute emotion numeric
+
+@data
+1, 1, 1, ?
