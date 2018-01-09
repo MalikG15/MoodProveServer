@@ -3,7 +3,8 @@
 @attribute temperature numeric
 @attribute sleephours numeric
 @attribute events numeric
+@attribute day {mon, tue, wed, thur, fri, sat, sun}
 @attribute emotion numeric
 
 @data
-1, 1, 1, ?
+1, 1, 1, tue, ?

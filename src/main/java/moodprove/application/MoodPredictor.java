@@ -7,6 +7,12 @@ import weka.core.converters.ConverterUtils;
 
 public class MoodPredictor {
 	
+	
+	public void writeToPast() {
+		// ADD MUSIC
+	}
+	
+	
 	public static void main(String[] args) throws Exception {
 	    // Load training data set
         ConverterUtils.DataSource source = new ConverterUtils.DataSource("src/main/java/moodprove/application/emotions-past.arff");
@@ -34,7 +40,7 @@ public class MoodPredictor {
             double predNB = nb.classifyInstance(newInst);
 
             System.out.println("-----------------------------");
-            System.out.println(predNB);
+            System.out.println(Math.round(predNB));
             //sendData(predString);
         }
 
