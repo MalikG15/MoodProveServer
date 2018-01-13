@@ -7,3 +7,9 @@ gradle/*
 gradlew
 gradlew.bat
 settings.gradle
+.DS_Store
+resources/.DS_Store
+src/.DS_Store
+src/main/.DS_Store
+src/main/java/.DS_Store
+src/main/java/moodprove/.DS_Store
