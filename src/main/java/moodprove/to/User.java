@@ -25,6 +25,8 @@ public class User {
 	  private String password;
 	  @Column(name = "facebookaccesstoken")
 	  private String facebookAccessToken;
+	  @Column(name = "googleaccesstoken")
+	  private String googleAccessToken;
 	  
 
 }
