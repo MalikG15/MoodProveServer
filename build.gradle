@@ -40,6 +40,9 @@ dependencies {
     compile 'org.hibernate:hibernate-entitymanager'
     compile 'org.springframework:spring-aspects'
     compile 'org.springframework:spring-context-support'
+    compile 'com.google.api-client:google-api-client:1.23.0'
+    compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+    compile 'com.google.apis:google-api-services-calendar:v3-rev282-1.23.0'
 }
 
 task wrapper(type: Wrapper) {
