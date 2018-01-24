@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Scanner;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +23,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import moodprove.data.UserRepository;
-
-import moodprove.calendar.GoogleCalendarEvents;
+import moodprove.google.GoogleCalendarEvents;
 
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+
+import com.restfb.DefaultWebRequestor;
+import com.restfb.WebRequestor;
+
+import moodprove.facebook.OAuthFacebook;
 
 /**
  * @author Malik Graham
@@ -91,6 +97,22 @@ public class AuthenticationRestController {
 	public boolean linkFileExists() {
 		File linkFile = new File("google_calendar_oauth_link.txt");
 		return linkFile.exists();
+	}
+	
+	@RequestMapping("/facebook")
+	public String getFacebookToken(@RequestParam("code") String code) {
+		JSONObject t = new JSONObject();
+		try {
+			t = OAuthFacebook.getFacebookUserToken(code);
+		}
+		catch (IOException ex) {
+			System.out.println(AuthenticationRestController.class.getName());
+			System.out.println("Retrieving the access token failed.");
+			t.put("Error", "Retrieving the access token failed");
+			return t.toString();
+		}
+		
+		return String.format(OAuthFacebook.getOauthSuccessReponseHtml(), t.getString("access_token"));
 	}
 	
 }

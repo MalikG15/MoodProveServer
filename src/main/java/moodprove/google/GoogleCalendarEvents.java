@@ -1,8 +1,6 @@
-package moodprove.calendar;
+package moodprove.google;
 
 import com.google.api.client.auth.oauth2.Credential;
-import moodprove.calendar.AuthorizationCodeInstalledApp;
-import moodprove.calendar.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -14,6 +12,9 @@ import com.google.api.client.util.DateTime;
 
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
+
+import moodprove.google.AuthorizationCodeInstalledApp;
+import moodprove.google.LocalServerReceiver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class GoogleCalendarEvents {
         GoogleClientSecrets clientSecrets =
             GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));*/
         
-    	FileInputStream f = new FileInputStream("src/main/java/moodprove/calendar/google_oauth_client_secret.json");
+    	FileInputStream f = new FileInputStream("src/main/java/moodprove/google/google_oauth_client_secret.json");
     	
     	GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(f));
@@ -98,6 +99,7 @@ public class GoogleCalendarEvents {
     public static com.google.api.services.calendar.Calendar
         getCalendarService() throws IOException {
         Credential credential = authorize();
+        // Can get a refesh token with a method
         return new com.google.api.services.calendar.Calendar.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)

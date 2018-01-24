@@ -1,4 +1,4 @@
-package moodprove.calendar;
+package moodprove.google;
 /*
  * Copyright (c) 2012 Google Inc.
  *

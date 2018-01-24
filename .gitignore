@@ -13,5 +13,6 @@ src/.DS_Store
 src/main/.DS_Store
 src/main/java/.DS_Store
 src/main/java/moodprove/.DS_Store
-src/main/java/moodprove/calendar/google_oauth_client_secret.json
+src/main/java/moodprove/google/google_oauth_client_secret.json
 google_calendar_oauth_link.txt
+src/main/java/moodprove/facebook/OAuthFacebookClientInfo.java
