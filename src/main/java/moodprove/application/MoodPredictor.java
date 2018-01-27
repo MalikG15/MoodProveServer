@@ -5,6 +5,11 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 
+/**
+ * 
+ * @author malikg
+ *
+ */
 public class MoodPredictor {
 	
 	
