@@ -85,6 +85,8 @@ public class AuthorizationCodeInstalledApp {
       // receive authorization code and exchange it for an access token
       String code = receiver.waitForCode();
       TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
+      // Print out result
+      System.out.println("The access token is: " + response.getAccessToken());
       // store credential and return it
       return flow.createAndStoreCredential(response, userId);
     } finally {

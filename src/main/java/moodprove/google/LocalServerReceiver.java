@@ -268,6 +268,7 @@ public final class LocalServerReceiver implements VerificationCodeReceiver {
         } else if (error != null && failureLandingPageUrl != null) {
           response.sendRedirect(failureLandingPageUrl);
         } else {
+          // destroy the link file as the server will stop running
           writeLandingHtml(response);
         }
         response.flushBuffer();
