@@ -264,11 +264,24 @@ public final class LocalServerReceiver implements VerificationCodeReceiver {
         code = request.getParameter("code");
 
         if (error == null && successLandingPageUrl != null) {
-          response.sendRedirect(successLandingPageUrl);
+          new Thread(){
+        	  @Override
+        	  public void run() {
+        		  try {
+        			  Thread.sleep(100);
+        			  response.sendRedirect(successLandingPageUrl);
+        		  }
+        		  catch (Exception ex) {
+        			  ex.printStackTrace();
+        		  }
+        	  }
+          }.start();
+          
         } else if (error != null && failureLandingPageUrl != null) {
           response.sendRedirect(failureLandingPageUrl);
         } else {
           // destroy the link file as the server will stop running
+          OAuthGoogle.deleteLinkFile();
           writeLandingHtml(response);
         }
         response.flushBuffer();
@@ -283,12 +296,7 @@ public final class LocalServerReceiver implements VerificationCodeReceiver {
       response.setContentType("text/html");
 
       PrintWriter doc = response.getWriter();
-      doc.println("<html>");
-      doc.println("<head><title>OAuth 2.0 Authentication Token Received</title></head>");
-      doc.println("<body>");
-      doc.println("Received verification code. You may now close this window.");
-      doc.println("</body>");
-      doc.println("</html>");
+      doc.print(String.format(GoogleCalendarEvents.OAUTH_GOOGLE_CALENDAR_SUCCESS_REPONSE_HTML, ""));
       doc.flush();
     }
   }

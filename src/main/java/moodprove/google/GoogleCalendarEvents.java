@@ -18,7 +18,7 @@ import moodprove.rest.AuthenticationRestController;
 
 public class GoogleCalendarEvents {
 	
-	private static final String OAUTH_GOOGLE_CALENDAR_SUCCESS_REPONSE_HTML = "<!DOCTYPE html>"
+	public static final String OAUTH_GOOGLE_CALENDAR_SUCCESS_REPONSE_HTML = "<!DOCTYPE html>"
 			+ "<html>"
 			+ "<head>"
 			+ "<style>"
@@ -26,7 +26,7 @@ public class GoogleCalendarEvents {
 			+ "</style>"
 			+ "</head>"
 			+ "<body>"
-			+ "<div><a href=\"lawrence.moodprovemacapp://%s\"/> Click Here to Finish Authorizing MoodProve to use Google Calendar Data </a></div>"
+			+ "<div><a href=\"lawrence.moodprovemacapp://%s\"/> Click Here to Finish Authorizing MoodProve</a></div>"
 			+ "</body>"
 			+ "</html>";
     
@@ -36,12 +36,18 @@ public class GoogleCalendarEvents {
             Arrays.asList(CalendarScopes.CALENDAR_READONLY, "https://www.googleapis.com/auth/userinfo.email");
 
     private static final String CREDENTIAL_FILE_NAME = "src/main/java/moodprove/google/google_oauth_client_secret.json";
+    
+    private final String userId;
+    
+    public GoogleCalendarEvents(String userId) {
+    	this.userId = userId;
+    }
 	
     // The credentials used for calendar are compatible with SleepCloud API storage
-	public static Calendar buildCalendar() {
+	public Calendar buildCalendar() {
 		try {
 			OAuthGoogle oauthGoogle = new OAuthGoogle(SCOPES, CREDENTIAL_FILE_NAME);
-			Credential credential = oauthGoogle.authorize();
+			Credential credential = oauthGoogle.authorize(userId);
 			return new Calendar
 					.Builder(oauthGoogle.getHTTP_TRANSPORT(), oauthGoogle.getJsonFactory(), credential)
 					.setApplicationName(oauthGoogle.getApplicationName())
@@ -57,12 +63,12 @@ public class GoogleCalendarEvents {
 	
 	// Starting a new thread that starts a new server
 	// that listens and waits for the user to authenticate
-	public static void startGoogleCalendarAuthenticationThread() {
+	public void startGoogleCalendarAuthenticationThread() {
 		Thread authenticationThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					GoogleCalendarEvents.getCalendarEvents();
+					getCalendarEvents();
 				}
 				catch (IOException ex) {
 					System.out.println(GoogleCalendarEvents.class.getName());
@@ -74,7 +80,7 @@ public class GoogleCalendarEvents {
 	}
 	
 	
-	public static void getCalendarEvents() throws IOException {
+	public void getCalendarEvents() throws IOException {
 		Calendar calendar = buildCalendar();
 		if (calendar == null) return;
 		

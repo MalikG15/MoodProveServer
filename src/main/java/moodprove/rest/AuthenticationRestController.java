@@ -49,19 +49,19 @@ public class AuthenticationRestController {
 
 	
 	@RequestMapping("/google")
-	public String getOAuthGoogleLink() {	
+	public String getOAuthGoogleLink(@RequestParam("userid") String userId) {	
 		try {
-			System.out.println("isGoogleTokenValid: " + OAuthGoogle.isGoogleTokenValid("user"));
-			if (!OAuthGoogle.isGoogleTokenValid("user")) {
+			System.out.println("isGoogleTokenValid: " + OAuthGoogle.isGoogleTokenValid(userId));
+			if (!OAuthGoogle.isGoogleTokenValid(userId)) {
 				if (!OAuthGoogle.googleOAuthConfirmationLinkExists()) {
-					GoogleCalendarEvents.startGoogleCalendarAuthenticationThread();
+					GoogleCalendarEvents e = new GoogleCalendarEvents(userId);
+					e.startGoogleCalendarAuthenticationThread();
 				}
 				String linkToAuthenticate = OAuthGoogle.readGoogleOAuthConfirmationLinkFile();
 				JSONObject responseObj = new JSONObject();
 				responseObj.put("Response", linkToAuthenticate);		
 				return responseObj.toString();
 			}
-			OAuthGoogle.deleteLinkFile();
 			return OAuthGoogle.getAUTHENTICATION_STILL_VALID_RESPONSE().toString();
 		}
 		catch (IOException ex) {
@@ -87,6 +87,7 @@ public class AuthenticationRestController {
 			return t.toString();
 		}
 		
+		// 
 		return String.format(OAuthFacebook.getOauthSuccessReponseHtml(), t.getString("access_token"));
 	}
 	

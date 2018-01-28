@@ -82,7 +82,7 @@ public class OAuthGoogle {
      * @return an authorized Credential object.
      * @throws IOException
      */
-    public Credential authorize() throws IOException {
+    public Credential authorize(String userId) throws IOException {
         // Load client secrets.
     	FileInputStream f = new FileInputStream(credentialFileName);
     	
@@ -97,7 +97,7 @@ public class OAuthGoogle {
                 .setAccessType("offline")
                 .build();
         Credential credential = new AuthorizationCodeInstalledApp(
-            flow, new LocalServerReceiver()).authorize("user");
+            flow, new LocalServerReceiver()).authorize(userId);
         System.out.println(
                 "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
