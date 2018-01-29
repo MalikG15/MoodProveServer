@@ -15,8 +15,6 @@ import org.hibernate.annotations.GenericGenerator;
 public class Event {
 
 	  @Id
-	  @GenericGenerator(name = "uuid", strategy = "uuid2")
-	  @GeneratedValue(generator = "uuid")
 	  @Column(name = "eventid")
 	  private String eventid;
 	  @Column(name = "userid")

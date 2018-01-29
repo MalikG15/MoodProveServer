@@ -76,7 +76,6 @@ public class GoogleCalendarEvents {
 		authenticationThread.start();
 	}
 	
-	
 	public void getCalendarEvents() throws IOException {
 		Calendar calendar = buildCalendar();
 		if (calendar == null) return;

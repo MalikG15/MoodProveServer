@@ -13,7 +13,6 @@ import moodprove.google.GoogleCalendarEvents;
 import moodprove.google.OAuthGoogle;
 import moodprove.to.User;
 import moodprove.to.UserSQLAssist;
-
 import moodprove.facebook.OAuthFacebook;
 
 /**
@@ -75,5 +74,5 @@ public class AuthenticationRestController {
 		
 		return String.format(OAuthFacebook.getOauthSuccessReponseHtml(), t.getString("access_token"));
 	}
-	
+
 }
