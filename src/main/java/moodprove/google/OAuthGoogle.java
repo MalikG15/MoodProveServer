@@ -3,11 +3,9 @@ package moodprove.google;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Scanner;
 
 import org.json.JSONObject;
 
@@ -58,8 +56,6 @@ public class OAuthGoogle {
     /** Global instance of the HTTP transport. */
     private static HttpTransport HTTP_TRANSPORT;
     
-    private static final String GOOGLE_CALENDAR_SLEEPCLOUD_OAUTH_CONFIRMATION_LINK_FILE_NAME = "google_calendar_oauth_link.txt";
-    
     static {
         try {
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -96,47 +92,13 @@ public class OAuthGoogle {
                 .setDataStoreFactory(DATA_STORE_FACTORY)
                 .setAccessType("offline")
                 .build();
+        
         Credential credential = new AuthorizationCodeInstalledApp(
-            flow, new LocalServerReceiver()).authorize(userId);
+            flow, new LocalServerReceiver(userId)).authorize(userId);
         System.out.println(
                 "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
     }
-    
-    // The link where the user must go to authenticate
- 	// is written to a file, and must be read and sent
- 	public static String readGoogleOAuthConfirmationLinkFile() {
- 		String link = new String();
- 		try {
- 			// Sleeping the thread just in case it takes time 
- 			// to write to the file
- 			Thread.sleep(500);
- 			File linkFile = new File(GOOGLE_CALENDAR_SLEEPCLOUD_OAUTH_CONFIRMATION_LINK_FILE_NAME);
- 			Scanner fileInput = new Scanner(linkFile);
- 			if (fileInput.hasNextLine())
- 				link = fileInput.nextLine();
- 			fileInput.close();
- 		}
- 		catch (InterruptedException ex) {
- 			System.out.println(OAuthGoogle.class.getName());
- 			System.out.println("The main thread failed to sleep");
- 		}
- 		catch (FileNotFoundException ex) {
- 			System.out.println(OAuthGoogle.class.getName());
- 			System.out.println("The link file was not found");
- 		}
- 		return link;
- 	}
- 	
- 	public static void deleteLinkFile() {
- 		File linkFile = new File(GOOGLE_CALENDAR_SLEEPCLOUD_OAUTH_CONFIRMATION_LINK_FILE_NAME);
- 		linkFile.delete();
- 	}
-
- 	public static boolean googleOAuthConfirmationLinkExists() {
- 		File linkFile = new File(GOOGLE_CALENDAR_SLEEPCLOUD_OAUTH_CONFIRMATION_LINK_FILE_NAME);
- 		return linkFile.exists();
- 	}
  	
  	public static boolean isGoogleTokenValid(String userId) throws IOException {
  		DataStore<StoredCredential> credentialDataStore = DATA_STORE_FACTORY.getDataStore(StoredCredential.class.getSimpleName());
@@ -166,7 +128,6 @@ public class OAuthGoogle {
  	      
  	      return null;
  	}
- 	
 
 	public HttpTransport getHTTP_TRANSPORT() {
 		return HTTP_TRANSPORT;

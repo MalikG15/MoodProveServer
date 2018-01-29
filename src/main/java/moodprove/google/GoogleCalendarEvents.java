@@ -1,12 +1,10 @@
 package moodprove.google;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
@@ -14,7 +12,6 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 
 import moodprove.google.OAuthGoogle;
-import moodprove.rest.AuthenticationRestController;
 
 public class GoogleCalendarEvents {
 	

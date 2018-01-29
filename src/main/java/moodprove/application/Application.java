@@ -17,7 +17,6 @@ import moodprove.google.OAuthGoogle;;
 @EnableAutoConfiguration
 public class Application implements CommandLineRunner {
 	  public static void main(final String[] args) {
-		  OAuthGoogle.deleteLinkFile();
 		  SpringApplication.run(Application.class, args);
 	  }
 	  

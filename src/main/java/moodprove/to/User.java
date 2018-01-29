@@ -14,19 +14,53 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "User")
 public class User {
 	
-	  @Id
-	  @GenericGenerator(name = "uuid", strategy = "uuid2")
-	  @GeneratedValue(generator = "uuid")
-	  @Column(name = "userid")
-	  private String userid;
-	  @Column(name = "username")
-	  private String username;
-	  @Column(name = "password")
-	  private String password;
-	  @Column(name = "facebookaccesstoken")
-	  private String facebookAccessToken;
-	  @Column(name = "googleaccesstoken")
-	  private String googleAccessToken;
+	@Id
+	@GenericGenerator(name = "uuid", strategy = "uuid2")
+	@GeneratedValue(generator = "uuid")
+	@Column(name = "userid")
+	private String userid;
+	@Column(name = "email")
+	private String email;
+	@Column(name = "password")
+	private String password;
+	@Column(name = "facebookaccesstoken")
+	private String facebookAccessToken;
+	@Column(name = "googleoauthlink", length = 500)
+	private String googleOAuthLink;
+	  
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public String getUsername() {
+		return email;
+	}
+	public void setUsername(String email) {
+		this.email = email;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getFacebookAccessToken() {
+		return facebookAccessToken;
+	}
+	public void setFacebookAccessToken(String facebookAccessToken) {
+		this.facebookAccessToken = facebookAccessToken;
+	}
+	public String getGoogleOauthLink() {
+		return googleOAuthLink;
+	}
+	public void setGoogleOauthLink(String googleOauthLink) {
+		this.googleOAuthLink = googleOauthLink;
+	}
+	public boolean googleOAuthConfirmationLinkExists() {
+		return googleOAuthLink != null;
+	}
 	  
 
 }

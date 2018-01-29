@@ -1,38 +1,18 @@
 package moodprove.rest;
 
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Scanner;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import moodprove.data.UserRepository;
 import moodprove.google.GoogleCalendarEvents;
-import moodprove.google.GoogleCalendarEventsOld;
 import moodprove.google.OAuthGoogle;
-
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.CrossOrigin;
-
-
-import com.restfb.DefaultWebRequestor;
-import com.restfb.WebRequestor;
+import moodprove.to.User;
+import moodprove.to.UserSQLAssist;
 
 import moodprove.facebook.OAuthFacebook;
 
@@ -50,14 +30,15 @@ public class AuthenticationRestController {
 	
 	@RequestMapping("/google")
 	public String getOAuthGoogleLink(@RequestParam("userid") String userId) {	
+		User user = userRepo.findByuserid(userId);
 		try {
-			System.out.println("isGoogleTokenValid: " + OAuthGoogle.isGoogleTokenValid(userId));
 			if (!OAuthGoogle.isGoogleTokenValid(userId)) {
-				if (!OAuthGoogle.googleOAuthConfirmationLinkExists()) {
-					GoogleCalendarEvents e = new GoogleCalendarEvents(userId);
-					e.startGoogleCalendarAuthenticationThread();
+				if (!user.googleOAuthConfirmationLinkExists()) {
+					GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
+					calendarEvents.startGoogleCalendarAuthenticationThread();
+					Thread.sleep(500);
 				}
-				String linkToAuthenticate = OAuthGoogle.readGoogleOAuthConfirmationLinkFile();
+				String linkToAuthenticate = UserSQLAssist.getLink(userId);
 				JSONObject responseObj = new JSONObject();
 				responseObj.put("Response", linkToAuthenticate);		
 				return responseObj.toString();
@@ -69,6 +50,11 @@ public class AuthenticationRestController {
 			System.out.println("Retrieving the Google access token failed.");
 			return OAuthGoogle.getERROR_RETRIEVING_TOKEN().toString();
 		}
+ 		catch (InterruptedException ex) {
+ 			System.out.println(OAuthGoogle.class.getName());
+ 			System.out.println("The main thread failed to sleep");
+ 			return OAuthGoogle.getERROR_RETRIEVING_TOKEN().toString();
+ 		}
 	}
 	
 	
@@ -87,7 +73,6 @@ public class AuthenticationRestController {
 			return t.toString();
 		}
 		
-		// 
 		return String.format(OAuthFacebook.getOauthSuccessReponseHtml(), t.getString("access_token"));
 	}
 	

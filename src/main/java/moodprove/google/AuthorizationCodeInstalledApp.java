@@ -18,15 +18,13 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.util.Preconditions;
+
+import moodprove.to.UserSQLAssist;
+
 import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 
 import java.awt.Desktop;
-import java.awt.Desktop.Action;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -39,6 +37,7 @@ import java.util.logging.Logger;
  *
  * @since 1.11
  * @author Yaniv Inbar
+ * 
  */
 public class AuthorizationCodeInstalledApp {
 
@@ -81,7 +80,7 @@ public class AuthorizationCodeInstalledApp {
       String redirectUri = receiver.getRedirectUri();
       AuthorizationCodeRequestUrl authorizationUrl =
           flow.newAuthorizationUrl().setRedirectUri(redirectUri);
-      onAuthorization(authorizationUrl);
+      onAuthorization(authorizationUrl, userId);
       // receive authorization code and exchange it for an access token
       String code = receiver.waitForCode();
       TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
@@ -112,8 +111,8 @@ public class AuthorizationCodeInstalledApp {
    * @param authorizationUrl authorization URL
    * @throws IOException I/O exception
    */
-  protected void onAuthorization(AuthorizationCodeRequestUrl authorizationUrl) throws IOException {
-    browse(authorizationUrl.build());
+  protected void onAuthorization(AuthorizationCodeRequestUrl authorizationUrl, String userId) throws IOException {
+    browse(authorizationUrl.build(), userId);
   }
 
   /**
@@ -122,45 +121,9 @@ public class AuthorizationCodeInstalledApp {
    *
    * @param url URL to browse
    */
-  public static void browse(String url) {
+  public static void browse(String url, String userId) {
     Preconditions.checkNotNull(url);
-    
-    // Added by Malik Graham
-    // Write the URL to a file
-    try {
-    	String fileName = "google_calendar_oauth_link.txt";
-    	BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-    	writer.write(url);
-        writer.close();
-    }
-    catch (IOException ex) {
-    	System.out.println("Error writing link to file");
-    }
-    
-    
-    
-    
-    /*// Ask user to open in their browser using copy-paste
-    System.out.println("Please open the following address in your browser:");
-    System.out.println("  " + url);
-    // Attempt to open it in the browser
-    try {
-      if (Desktop.isDesktopSupported()) {
-        Desktop desktop = Desktop.getDesktop();
-        if (desktop.isSupported(Action.BROWSE)) {
-          System.out.println("Attempting to open that address in the default browser now...");
-          desktop.browse(URI.create(url));
-        }
-      }
-    } catch (IOException e) {
-      LOGGER.log(Level.WARNING, "Unable to open browser", e);
-    } catch (InternalError e) {
-      // A bug in a JRE can cause Desktop.isDesktopSupported() to throw an
-      // InternalError rather than returning false. The error reads,
-      // "Can't connect to X11 window server using ':0.0' as the value of the
-      // DISPLAY variable." The exact error message may vary slightly.
-      LOGGER.log(Level.WARNING, "Unable to open browser", e);
-    }*/
+    UserSQLAssist.addLink(url, userId);
   }
 
   /** Returns the authorization code flow. */

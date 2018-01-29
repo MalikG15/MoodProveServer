@@ -14,6 +14,9 @@ package moodprove.google;
  */
 import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 import com.google.api.client.util.Throwables;
+
+import moodprove.to.UserSQLAssist;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.Semaphore;
@@ -73,6 +76,11 @@ public final class LocalServerReceiver implements VerificationCodeReceiver {
    * default landing page will be shown (via direct response).
    */
   private String failureLandingPageUrl;
+  
+  /**
+   * MoodProve userId
+   */
+  private String userId;
 
   /**
    * Constructor that starts the server on {@link #LOCALHOST} and an unused port.
@@ -81,8 +89,9 @@ public final class LocalServerReceiver implements VerificationCodeReceiver {
    * Use {@link Builder} if you need to specify any of the optional parameters.
    * </p>
    */
-  public LocalServerReceiver() {
+  public LocalServerReceiver(String userId) {
     this(LOCALHOST, -1, CALLBACK_PATH, null, null);
+    this.userId = userId;
   }
 
   /**
@@ -280,8 +289,6 @@ public final class LocalServerReceiver implements VerificationCodeReceiver {
         } else if (error != null && failureLandingPageUrl != null) {
           response.sendRedirect(failureLandingPageUrl);
         } else {
-          // destroy the link file as the server will stop running
-          OAuthGoogle.deleteLinkFile();
           writeLandingHtml(response);
         }
         response.flushBuffer();
@@ -296,6 +303,7 @@ public final class LocalServerReceiver implements VerificationCodeReceiver {
       response.setContentType("text/html");
 
       PrintWriter doc = response.getWriter();
+      UserSQLAssist.deleteLink(userId);
       doc.print(String.format(GoogleCalendarEvents.OAUTH_GOOGLE_CALENDAR_SUCCESS_REPONSE_HTML, ""));
       doc.flush();
     }
