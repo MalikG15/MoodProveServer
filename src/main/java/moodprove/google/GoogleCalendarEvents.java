@@ -64,13 +64,7 @@ public class GoogleCalendarEvents {
 		Thread authenticationThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				try {
-					getCalendarEvents();
-				}
-				catch (IOException ex) {
-					System.out.println(GoogleCalendarEvents.class.getName());
-					System.out.println("There was an error getting the Google calendar events");
-				}
+				buildCalendar();
 			}
 		});
 		authenticationThread.start();
