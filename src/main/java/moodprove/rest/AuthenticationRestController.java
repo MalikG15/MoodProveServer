@@ -31,9 +31,9 @@ public class AuthenticationRestController {
 	public String getOAuthGoogleLink(@RequestParam("userid") String userId) {	
 		User user = userRepo.findByuserid(userId);
 		try {
-			if (!OAuthGoogle.isGoogleTokenValid(userId)) {
+			GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
+			if (!calendarEvents.isTokenValid()) {
 				if (!user.googleOAuthConfirmationLinkExists()) {
-					GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
 					calendarEvents.startGoogleCalendarAuthenticationThread();
 					Thread.sleep(500);
 				}

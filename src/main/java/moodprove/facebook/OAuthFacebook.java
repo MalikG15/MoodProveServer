@@ -4,7 +4,11 @@ import java.io.IOException;
 
 import org.json.JSONObject;
 
+import com.restfb.DefaultFacebookClient;
 import com.restfb.DefaultWebRequestor;
+import com.restfb.FacebookClient;
+import com.restfb.FacebookClient.AccessToken;
+import com.restfb.Version;
 import com.restfb.WebRequestor;
 
 public class OAuthFacebook {
@@ -23,17 +27,35 @@ public class OAuthFacebook {
 	
 	private static final String REDIRECT_URL = "http://localhost:8080/auth/facebook";
 	
+	private static String APP_ID;
+	
+	private static String SECRET_KEY;
+	
+	static {
+		try {
+			APP_ID = OAuthFacebookClientInfo.getClientId();
+			SECRET_KEY = OAuthFacebookClientInfo.getClientPassword();
+		}
+		catch (Throwable t) {
+            t.printStackTrace();
+            System.exit(1);
+        }
+	}
+	
 	public static JSONObject getFacebookUserToken(String code) throws IOException {
-	    String appId = OAuthFacebookClientInfo.getClientId();
-	    String secretKey = OAuthFacebookClientInfo.getClientPassword();
-
 	    WebRequestor wr = new DefaultWebRequestor();
 	    WebRequestor.Response accessTokenResponse = wr.executeGet(
-	            "https://graph.facebook.com/oauth/access_token?client_id=" + appId + "&redirect_uri=" + REDIRECT_URL
-	            + "&client_secret=" + secretKey + "&code=" + code);
+	            "https://graph.facebook.com/oauth/access_token?client_id=" + APP_ID + "&redirect_uri=" + REDIRECT_URL
+	            + "&client_secret=" + SECRET_KEY + "&code=" + code);
 
 	    JSONObject obj = new JSONObject(accessTokenResponse.getBody());
 	    return obj;
+	}
+	
+	public static String getExtendedAccessToken(String token) {
+		FacebookClient facebookClient = new DefaultFacebookClient(token, Version.LATEST);
+		AccessToken extendedAccessToken = facebookClient.obtainExtendedAccessToken(APP_ID, SECRET_KEY, token);
+		return extendedAccessToken.getAccessToken();
 	}
 
 	public static String getOauthSuccessReponseHtml() {
@@ -42,6 +64,10 @@ public class OAuthFacebook {
 
 	public static String getRedirectUrl() {
 		return REDIRECT_URL;
+	}
+	
+	public static void main(String[] args) {
+		
 	}
 
 }

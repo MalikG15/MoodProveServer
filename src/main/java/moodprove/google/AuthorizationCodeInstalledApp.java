@@ -22,6 +22,7 @@ import com.google.api.client.util.Preconditions;
 import moodprove.to.UserSQLAssist;
 
 import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
+import com.google.api.client.googleapis.auth.oauth2.OAuth2Utils;
 
 import java.awt.Desktop;
 import java.io.IOException;

@@ -3,6 +3,7 @@ package moodprove.google;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -48,6 +49,7 @@ public class OAuthGoogle {
     
     /** File that contains OAuth Credentials **/
     private String credentialFileName;
+    
 
     /** Global instance of the JSON factory. */
     private static final JsonFactory JSON_FACTORY =
@@ -95,12 +97,13 @@ public class OAuthGoogle {
         
         Credential credential = new AuthorizationCodeInstalledApp(
             flow, new LocalServerReceiver(userId)).authorize(userId);
+        
         System.out.println(
                 "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
     }
  	
- 	public static boolean isGoogleTokenValid(String userId) throws IOException {
+ 	public boolean isGoogleTokenValid(String userId) throws IOException {
  		DataStore<StoredCredential> credentialDataStore = DATA_STORE_FACTORY.getDataStore(StoredCredential.class.getSimpleName());
 
  	    if (credentialDataStore != null) {
@@ -108,17 +111,51 @@ public class OAuthGoogle {
  	       if (stored != null) {
  	    	  Long expirationTimeMilliseconds = stored.getExpirationTimeMilliseconds();
  	    	  String refreshToken = stored.getRefreshToken();
- 	    	  return ((expirationTimeMilliseconds - Clock.SYSTEM.currentTimeMillis()) / 1000) > 60 &&
- 	    			  refreshToken != null;
+ 	    	 System.out.println(stored.getAccessToken() + " is the access token.");
+ 	    	  if (((expirationTimeMilliseconds - Clock.SYSTEM.currentTimeMillis()) / 1000) < 60 &&
+ 	    			  refreshToken != null) {
+ 	    		  return refreshToken(userId);
+ 	    	  }
+ 	    	  return true;
  	       }
  	    }
  	    
  	    return false;
  	}
  	
+ 	// A new flow instance is needed to refresh the token.
+ 	// Not creating a new flow in the global state to prevent
+ 	// any unexpected errors.
+ 	public boolean refreshToken(String userId) {
+ 		try {
+	 		FileInputStream f = new FileInputStream(credentialFileName);
+	 		GoogleClientSecrets clientSecrets =
+	                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(f));
+	 		GoogleAuthorizationCodeFlow flow =
+	                new GoogleAuthorizationCodeFlow.Builder(
+	                        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
+	                .setDataStoreFactory(DATA_STORE_FACTORY)
+	                .setAccessType("offline")
+	                .build();
+	 		Credential credential = flow.loadCredential(userId);
+	 	    System.out.println(credential.getAccessToken() + " is the access token.");
+	 		return credential.refreshToken();
+ 		}
+ 		catch (FileNotFoundException ex) {
+ 			System.out.println(OAuthGoogle.class.getName());
+ 			System.out.println("Could not load the credential file.");
+ 		}
+ 		catch (IOException ex) {
+ 			System.out.println(OAuthGoogle.class.getName());
+ 			System.out.println("IO Error.");
+ 		}
+ 		return false;
+ 	}
+ 	
+ 	
  	public static String getAccessToken(String userId) throws IOException {
  		DataStore<StoredCredential> credentialDataStore = DATA_STORE_FACTORY.getDataStore(StoredCredential.class.getSimpleName());
-
+ 		
  	    if (credentialDataStore != null) {
  	       StoredCredential stored = credentialDataStore.get(userId);
  	      if (stored != null) {
@@ -128,6 +165,7 @@ public class OAuthGoogle {
  	      
  	      return null;
  	}
+
 
 	public HttpTransport getHTTP_TRANSPORT() {
 		return HTTP_TRANSPORT;

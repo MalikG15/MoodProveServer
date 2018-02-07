@@ -36,14 +36,26 @@ public class GoogleCalendarEvents {
     
     private final String userId;
     
+    private OAuthGoogle oauthGoogle;
+    
     public GoogleCalendarEvents(String userId) {
     	this.userId = userId;
+    	try {
+    		this.oauthGoogle = new OAuthGoogle(SCOPES, CREDENTIAL_FILE_NAME);
+    	}
+    	catch (IOException ex) {
+    		System.out.println(GoogleCalendarEvents.class.getName());
+ 			System.out.println("Could not create an oauthGoogle instance.");
+    	}
+    }
+    
+    public boolean isTokenValid() throws IOException {
+    	return oauthGoogle.isGoogleTokenValid(userId);
     }
 	
     // The credentials used for calendar are compatible with SleepCloud API storage
 	public Calendar buildCalendar() {
 		try {
-			OAuthGoogle oauthGoogle = new OAuthGoogle(SCOPES, CREDENTIAL_FILE_NAME);
 			Credential credential = oauthGoogle.authorize(userId);
 			return new Calendar
 					.Builder(oauthGoogle.getHTTP_TRANSPORT(), oauthGoogle.getJsonFactory(), credential)
@@ -61,13 +73,12 @@ public class GoogleCalendarEvents {
 	// Starting a new thread that starts a new server
 	// that listens and waits for the user to authenticate
 	public void startGoogleCalendarAuthenticationThread() {
-		Thread authenticationThread = new Thread(new Runnable() {
+		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				buildCalendar();
 			}
-		});
-		authenticationThread.start();
+		}).start();
 	}
 	
 	public void getCalendarEvents() throws IOException {

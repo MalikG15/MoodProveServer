@@ -13,6 +13,7 @@ import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
 import com.restfb.Version;
+import com.restfb.exception.FacebookOAuthException;
 import com.restfb.json.JsonObject;
 import com.restfb.types.User;
 
@@ -35,7 +36,7 @@ public class FacebookUserData {
 		this.lastCheckIn = lastCheckIn;
 	}
 	
-	public int getFbDataByType(String type) {
+	public Integer getFbDataByType(String type) {
 		Connection<JsonObject> fbData = facebookClient.fetchConnection(facebookId + type, JsonObject.class, Parameter.with("date_format", "U"), Parameter.with("limit", "250"), Parameter.with("redirect","false"));
 		return getCountSinceLastCheckIn(fbData);
 	}
