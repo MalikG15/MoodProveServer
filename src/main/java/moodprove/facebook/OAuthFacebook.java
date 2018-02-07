@@ -1,13 +1,20 @@
 package moodprove.facebook;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.json.JSONObject;
 
+import com.restfb.Connection;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.DefaultWebRequestor;
 import com.restfb.FacebookClient;
 import com.restfb.FacebookClient.AccessToken;
+import com.restfb.Parameter;
+import com.restfb.json.JsonObject;
+
+import moodprove.http.MoodProveHttp;
+
 import com.restfb.Version;
 import com.restfb.WebRequestor;
 
@@ -52,6 +59,17 @@ public class OAuthFacebook {
 	    return obj;
 	}
 	
+	public static Long getTokenExpirationTime(String token) {
+		Long currentTime = System.currentTimeMillis() / 1000;
+		JSONObject tokenInfo = new JSONObject(MoodProveHttp.executeGet("https://graph.facebook.com/oauth/access_token_info?access_token=" + token));
+		Long timeAlive = null;
+		if (tokenInfo != null) {
+			timeAlive = tokenInfo.getLong("expires_in");
+		}
+		if (timeAlive != null) return currentTime + timeAlive; 
+		return null;
+	}
+	
 	public static String getExtendedAccessToken(String token) {
 		FacebookClient facebookClient = new DefaultFacebookClient(token, Version.LATEST);
 		AccessToken extendedAccessToken = facebookClient.obtainExtendedAccessToken(APP_ID, SECRET_KEY, token);
@@ -67,7 +85,7 @@ public class OAuthFacebook {
 	}
 	
 	public static void main(String[] args) {
-		
+
 	}
 
 }

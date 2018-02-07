@@ -40,7 +40,7 @@ public class FacebookUserData {
 		Connection<JsonObject> fbData = facebookClient.fetchConnection(facebookId + type, JsonObject.class, Parameter.with("date_format", "U"), Parameter.with("limit", "250"), Parameter.with("redirect","false"));
 		return getCountSinceLastCheckIn(fbData);
 	}
-	
+
 	public int getCountSinceLastCheckIn(Connection<JsonObject> fbData) {
 		int count = 0;
 		if (fbData != null) {
