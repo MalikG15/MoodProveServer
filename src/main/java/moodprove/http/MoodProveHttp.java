@@ -7,6 +7,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * 
+ * Simple HTTP request class to retrieve data
+ * for SleepCloud Storage API and Weather API.
+ * 
+ * It is also used by the Facebook token class.
+ *
+ */
 public class MoodProveHttp {
 	
 	public static String executePost(String targetUrl, String body) {
