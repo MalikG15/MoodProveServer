@@ -7,7 +7,7 @@ import moodprove.http.MoodProveHttp;
 
 public class WeatherData {
 	
-	private final static String WEATHER_API_DOMAIN = "https://api.darksky.net/forecast/%s/%s,%s";
+	private static final String WEATHER_API_CALL = "https://api.darksky.net/forecast/%s/%s,%s";
 	
 	private final Double longitude;
 	
@@ -19,15 +19,20 @@ public class WeatherData {
 	}
 
 	public JSONArray getDailyWeatherData() {
-		String weatherResponse = MoodProveHttp.executeGet(String.format(WEATHER_API_DOMAIN, WeatherAPIClientInfo.WEATHER_API_KEY, longitude, latitude));
+		String weatherResponse = MoodProveHttp.executeGet(String.format(WEATHER_API_CALL, WeatherAPIClientInfo.WEATHER_API_KEY, latitude, longitude), "");
 		JSONObject weatherData = new JSONObject(weatherResponse);
-		JSONArray daily = weatherData.getJSONArray("daily");
+		JSONArray daily = weatherData.getJSONObject("daily").getJSONArray("data");
 		return daily;
 	}
 	
 	public JSONObject getTodaysWeatherData() {
 		JSONArray weatherDailyArray = getDailyWeatherData();
 		return weatherDailyArray.getJSONObject(0);
+	}
+	
+	public static void main(String[] args) {
+		WeatherData data = new WeatherData(42.3601, -71.0589);
+		System.out.print(data.getTodaysWeatherData().toString());
 	}
 
 }

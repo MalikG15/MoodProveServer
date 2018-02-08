@@ -61,7 +61,7 @@ public class OAuthFacebook {
 	
 	public static Long getTokenExpirationTime(String token) {
 		Long currentTime = System.currentTimeMillis() / 1000;
-		JSONObject tokenInfo = new JSONObject(MoodProveHttp.executeGet("https://graph.facebook.com/oauth/access_token_info?access_token=" + token));
+		JSONObject tokenInfo = new JSONObject(MoodProveHttp.executeGet("https://graph.facebook.com/oauth/access_token_info?access_token=" + token, ""));
 		Long timeAlive = null;
 		if (tokenInfo != null) {
 			timeAlive = tokenInfo.getLong("expires_in");
