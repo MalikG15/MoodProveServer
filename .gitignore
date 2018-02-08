@@ -16,3 +16,4 @@ src/main/java/moodprove/.DS_Store
 src/main/java/moodprove/google/google_oauth_client_secret.json
 google_calendar_oauth_link.txt
 src/main/java/moodprove/facebook/OAuthFacebookClientInfo.java
+src/main/java/moodprove/weather/WeatherAPIClientInfo.java
