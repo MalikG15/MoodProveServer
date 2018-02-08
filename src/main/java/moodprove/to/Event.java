@@ -14,13 +14,42 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "Events")
 public class Event {
 
-	  @Id
-	  @Column(name = "eventid")
-	  private String eventid;
-	  @Column(name = "userid")
-	  private String userid;
-	  @Column(name = "rating")
-	  private int rating;
+	@Id
+	@GenericGenerator(name = "uuid", strategy = "uuid2")
+	@GeneratedValue(generator = "uuid")
+	@Column(name = "eventid")
+	private String eventid;
+	@Column(name = "userid")
+	private String userid;
+	@Column(name = "date")
+	private Long date;
+	@Column(name = "rating")
+	private Integer rating;
+	
+	public String getEventid() {
+		return eventid;
+	}
+	public void setEventid(String eventid) {
+		this.eventid = eventid;
+	}
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public Long getDate() {
+		return date;
+	}
+	public void setDate(Long date) {
+		this.date = date;
+	}
+	public Integer getRating() {
+		return rating;
+	}
+	public void setRating(Integer rating) {
+		this.rating = rating;
+	}
 	  
 	  
 }

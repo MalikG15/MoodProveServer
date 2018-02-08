@@ -25,8 +25,22 @@ public class User {
 	private String password;
 	@Column(name = "facebookaccesstoken")
 	private String facebookAccessToken;
+	@Column(name = "facebooktokenexpire")
+	private Long facebookTokenExpire;
 	@Column(name = "googleoauthlink", length = 500)
 	private String googleOAuthLink;
+	@Column(name = "timeofdailyprediction")
+	private Long timeOfDailyPrediction;
+	@Column(name = "timeoflastprediction")
+	private Long timeOfLastPrediction;
+	@Column(name = "timeofcheckin")
+	private Long timeOfCheckIn;
+	@Column(name = "timeoflastcheckin")
+	private Long timeOfLastCheckIn;
+	@Column(name = "longitude")
+	private Double longitude;
+	@Column(name = "latitude")
+	private Double latitude;
 	  
 	public String getUserid() {
 		return userid;

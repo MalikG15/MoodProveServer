@@ -21,15 +21,21 @@ public class PastMood {
 	  @Column(name = "userid")
 	  private String userid;
 	  @Column(name = "date")
-	  private long date;
-	  @Column(name = "temperature")
-	  private double temperature;
-	  @Column(name = "humdity")
-	  private double humidity;
-	  @Column(name = "cloudcover")
-	  private double cloudCover;
+	  private Long date;
+	  // This column will show the 
+	  // overall ratings for the events this day
+	  @Column(name = "eventrating")
+	  private Integer eventRatings;
+	  // This column will list event ids, to
+	  // display to the user what events they did this day
+	  @Column(name = "events", length = 1000)
+	  private String events;
 	  @Column(name = "sleephours")
-	  private int sleepHours;
+	  private Long sleephours;
+	  @Column(name = "socialid")
+	  private String socialId;
+	  @Column(name = "weatherid")
+	  private String weatherId;
 	  
 	  public String getPredictedMoodId() {
 		return pastMoodId;
@@ -43,35 +49,11 @@ public class PastMood {
 	  public void setUserid(String userid) {
 		this.userid = userid;
 	  }
-	  public long getDate() {
+	  public Long getDate() {
 		return date;
 	  }
-	  public void setDate(long date) {
+	  public void setDate(Long date) {
 		this.date = date;
-	  }
-	  public double getTemperature() {
-		return temperature;
-	  }
-	  public void setTemperature(double temperature) {
-		this.temperature = temperature;
-	  }
-	  public double getHumidity() {
-		return humidity;
-	  }
-	  public void setHumidity(double humidity) {
-		this.humidity = humidity;
-	  }
-	  public double getCloudCover() {
-		return cloudCover;
-	  }
-	  public void setCloudCover(double cloudCover) {
-		this.cloudCover = cloudCover;
-	  }
-	  public int getSleepHours() {
-		return sleepHours;
-	  }
-	  public void setSleepHours(int sleepHours) {
-		this.sleepHours = sleepHours;
 	  }
 
 }
