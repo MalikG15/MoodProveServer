@@ -23,6 +23,10 @@ import moodprove.to.Social;
  */
 public class MoodPredictor {
 	
+	private static final String MOOD_PAST_FILE_LOCATION = "src/main/java/moodprove/predict/mood-past.arff";
+	
+	private static final String MOOD_PREDICT_FILE_LOCATION = "src/main/java/moodprove/predict/mood-predict.arff";
+	
 	private static final String FILE_HEADER = "@relation qdb-weka.filters.unsupervised.attribute.Remove-R1";
 	
 	private static final String[] EVENT_HEADERS = new String[] {"@attribute eventratings REAL"};
@@ -94,7 +98,7 @@ public class MoodPredictor {
 		List<Long> predictions = new ArrayList<>();
 		try {
 			// Load training data set
-	        ConverterUtils.DataSource source = new ConverterUtils.DataSource("src/main/java/moodprove/predict/emotions-past.arff");
+	        ConverterUtils.DataSource source = new ConverterUtils.DataSource(MOOD_PAST_FILE_LOCATION);
 	        Instances trainDataSet = source.getDataSet();
 	        // Set class index to the last index
 	        trainDataSet.setClassIndex(trainDataSet.numAttributes() - 1);
@@ -105,7 +109,7 @@ public class MoodPredictor {
 	        System.out.println(nb);
 	
 	        // Load test data set
-	        ConverterUtils.DataSource predictionSource = new ConverterUtils.DataSource("src/main/java/moodprove/predict/emotions-predict.arff");
+	        ConverterUtils.DataSource predictionSource = new ConverterUtils.DataSource(MOOD_PREDICT_FILE_LOCATION);
 	        Instances predictionDataSet = predictionSource.getDataSet();
 	
 	
