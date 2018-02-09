@@ -24,11 +24,45 @@ public class Sleep {
 	  private String sleepId;
 	  @Column(name = "date")
 	  private Long date;
+	  @Column(name = "day")
+	  private String day;
 	  @Column(name = "sleeplength")
 	  private Integer sleeplength;
 	  @Column(name = "cycles")
 	  private Integer sleepCyles;
 	  @Column(name = "noiselevel")
 	  private Integer noiseLevel;
+
+	  
+	public String getSleepId() {
+		return sleepId;
+	}
+	public void setSleepId(String sleepId) {
+		this.sleepId = sleepId;
+	}
+	public Long getDate() {
+		return date;
+	}
+	public void setDate(Long date) {
+		this.date = date;
+	}
+	public Integer getSleeplength() {
+		return sleeplength;
+	}
+	public void setSleeplength(Integer sleeplength) {
+		this.sleeplength = sleeplength;
+	}
+	public Integer getSleepCyles() {
+		return sleepCyles;
+	}
+	public void setSleepCyles(Integer sleepCyles) {
+		this.sleepCyles = sleepCyles;
+	}
+	public Integer getNoiseLevel() {
+		return noiseLevel;
+	}
+	public void setNoiseLevel(Integer noiseLevel) {
+		this.noiseLevel = noiseLevel;
+	}
 
 }
