@@ -72,16 +72,14 @@ public class MoodProveCronJob extends TimerTask {
 	private static String convertTimeMillisToHour(Long timeMillis) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeMillis);
-	
-
-		int mHour = calendar.get(Calendar.HOUR);
-		return String.format("%d:00", mHour);
+		int hour = calendar.get(Calendar.HOUR);
+		String pmOrAm = (calendar.get(Calendar.AM_PM) == 1) ? "PM" : "AM";
+		return String.format("%d:00 %s", hour, pmOrAm);
 	}
 	
 	private static String convertTimeMillisToDay(Long timeMillis) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeMillis);
-
 		int mDay = calendar.get(Calendar.DAY_OF_WEEK);
 		return DAYS_OF_WEEK[mDay - 1];
 	}
@@ -161,13 +159,13 @@ public class MoodProveCronJob extends TimerTask {
 		Long twentyFourHoursInMilliseconds = Long.valueOf(86400*1000);
 		WeatherData weatherData = new WeatherData(user.getLongitude(), user.getLatitude());
 		JSONArray array = weatherData.getDailyWeatherData();
-		for (int x = 0; x < 7; x++) {
+		for (int day = 0; day < 7; day++) {
 			PredictedMood newMood = new PredictedMood();
 			newMood.setUserid(userId);
 			newMood.setDate(start);
 			newMood.setEvents(findEventsForDay(userId, start, start + twentyFourHoursInMilliseconds));
 			// Getting weather information for that day
-			newMood.setWeatherId(setWeatherDataForDay(weatherData, array.getJSONObject(x), userId, start));
+			newMood.setWeatherId(setWeatherDataForDay(weatherData, array.getJSONObject(day), userId, start));
 			// Getting averages for facebook activity for this day
 			newMood.setSocialId(setSocialActivityForDay(userId, start));
 			newMood.setSleepid(setSleepDataForDay(userId, start));
@@ -274,9 +272,10 @@ public class MoodProveCronJob extends TimerTask {
 					mood);
 		}
 		predictor.closeWriters();
-		// THE MOST IMPORTANT LINE OF CODE IN
-		// THIS ENTIRE PROJECT
+		
 		List<Long> results = predictor.predict();
+		// THE MOST IMPORTANT LINE OF CODE IN
+		// THIS ENTIRE PROJECT ^^^^^
 		for (int index = 0; index < predictedMood.size(); index++) {
 			PredictedMood mood = predictedMood.get(index);
 			mood.setPrediction(results.get(index));
@@ -286,6 +285,6 @@ public class MoodProveCronJob extends TimerTask {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(convertTimeMillisToDay(System.currentTimeMillis()));
+		System.out.println(convertTimeMillisToHour(System.currentTimeMillis()));
 	}
 }
