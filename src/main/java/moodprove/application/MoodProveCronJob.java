@@ -6,13 +6,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +30,15 @@ import moodprove.facebook.OAuthFacebook;
 import moodprove.google.GoogleCalendarEvents;
 import moodprove.sleep.SleepData;
 import moodprove.to.*;
+import moodprove.weather.WeatherData;
 
 @Service
 public class MoodProveCronJob extends TimerTask {
 	
 	@Autowired
-	private UserRepository userRepo;
+	private UserRepository userRepository;
 	@Autowired
-	private PastMoodRepository pastMoodRepo;
+	private PastMoodRepository pastMoodRepository;
 	@Autowired
 	private PredictedMoodRepository predictedMoodRepository;
 	@Autowired
@@ -51,12 +56,12 @@ public class MoodProveCronJob extends TimerTask {
 	public void run() {
 	   Long currentTime = System.currentTimeMillis();
 	   String hour = convertTimeMillisToHour(currentTime);
-	   List<User> users = userRepo.findAll()
+	   List<User> users = userRepository.findAll()
 			   .stream()
 			   .filter(u -> hour.equals(u.getScheduledTimeOfPrediction()))
 			   .collect(Collectors.toList());
 	   for (User u : users) {
-		   List<PastMood> moodHistory = pastMoodRepo.findAllByuserid(u.getUserid());
+		   List<PastMood> moodHistory = pastMoodRepository.findAllByuserid(u.getUserid());
 		   if (moodHistory.size() < 7) continue;
 		   PredictedMood oldestPredicted = predictedMoodRepository.findBydateLessThan(System.currentTimeMillis());
 		   if (oldestPredicted != null) {
@@ -65,19 +70,25 @@ public class MoodProveCronJob extends TimerTask {
 			   setPredictedToPastMood(u.getUserid(), oldestPredicted, currentTime - (86400*1000));
 		   }
 		   
+		  /*for (int x = 0; x < 7; x++) {
+			  PredictedMood newMood = new PredictedMood();
+			  List<Event> events = findEventsForDay(userId, currentTime)
+		  }
+		   
 		   // get event rating from current time to 24 hours later, for 7 days
 		   List<Integer> getRatings = findEventsForNext7Days(u.getUserid(), currentTime);
-		   
 		   // get weather from current time to 24 hours later, for 7 days
 		   
 		   // get average social for each day
 		   
-		   // get average sleep for each day
+		   // get average sleep for each day*/
+		   
+		   
 	   }
 	   
 	}
 	
-	public static String convertTimeMillisToHour(Long timeMillis) {
+	private static String convertTimeMillisToHour(Long timeMillis) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeMillis);
 	
@@ -86,7 +97,7 @@ public class MoodProveCronJob extends TimerTask {
 		return String.format("%d:00", mHour);
 	}
 	
-	public static String convertTimeMillisToDay(Long timeMillis) {
+	private static String convertTimeMillisToDay(Long timeMillis) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeMillis);
 
@@ -110,7 +121,7 @@ public class MoodProveCronJob extends TimerTask {
 		}
 		
 		// Check token validity before retrieving data 
-		String fbToken = userRepo.findfacebookAccessTokenByuserid(userId);
+		String fbToken = userRepository.findByuserid(userId).getFacebookAccessToken();
 		Social socialRecord = null;
 		if (System.currentTimeMillis() < OAuthFacebook.getTokenExpirationTime(fbToken)) {
 			socialRecord = changeRecentSocialData(userId, oldestPredicted, twentyFourHoursBefore, fbToken);
@@ -125,7 +136,7 @@ public class MoodProveCronJob extends TimerTask {
 		else newPastMood.setSocialId(oldestPredicted.getSocialId());
 		
 		newPastMood.setWeatherId(oldestPredicted.getWeatherId());
-		pastMoodRepo.saveAndFlush(newPastMood);
+		pastMoodRepository.saveAndFlush(newPastMood);
 	}
 	
 	public Sleep changeRecentSleepData(String userId, PredictedMood oldestPredicted, Long twentyFourHoursBefore, SleepData data) {
@@ -164,30 +175,90 @@ public class MoodProveCronJob extends TimerTask {
 		return socialRecord;
 	}
 	
+	public void setPredictionDataForNext7Days(User user, Long start) {
+		String userId = user.getUserid();
+		Long twentyFourHoursInMilliseconds = Long.valueOf(86400*1000);
+		WeatherData weatherData = new WeatherData(user.getLongitude(), user.getLatitude());
+		JSONArray array = weatherData.getDailyWeatherData();
+		for (int x = 0; x < 7; x++) {
+			PredictedMood newMood = new PredictedMood();
+			newMood.setUserid(userId);
+			newMood.setDate(start);
+			newMood.setEvents(findEventsForDay(userId, start, start + twentyFourHoursInMilliseconds));
+			// Getting weather information for that day
+			newMood.setWeatherId(setWeatherDataForDay(weatherData, array.getJSONObject(x), userId, start));
+			// Getting averages for facebook activity for this day
+			newMood.setSocialId(setSocialActivityForDay(userId, start));
+			newMood.setSleepid(setSleepDataForDay(userId, start));
+			
+			predictedMoodRepository.saveAndFlush(newMood);
+			start += twentyFourHoursInMilliseconds;
+		}
+	} 
+	
 	// Event ratings should be 1 - 10
 	// 0 should indicate no events happening at all for that day
-	public List<Integer> findEventsForNext7Days(String userId, Long currentTime) {
+	public String findEventsForDay(String userId, Long start, Long end) {
 		GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
-		Long twentyFourHoursInMilliseconds = Long.valueOf(86400*1000);
-		List<Integer> ratingsForNext7Days = new ArrayList<>();
-		for (int x = 0; x < 7; x++) {
-			int totalRatingForDay = 0;
-			List<com.google.api.services.calendar.model.Event> events = 
-					calendarEvents.getEventsWithinTimeFrame(currentTime, currentTime + twentyFourHoursInMilliseconds);
-			for (com.google.api.services.calendar.model.Event e : events) {
-				Event event = eventRepository.findByeventid(e.getId());
-				if (event != null) {
-					totalRatingForDay += event.getRating();
-				}
-				// Adding 5 as that is the base addition, if the 
-				// event has not been rated yet
-				else totalRatingForDay += 5;
-			}
-			ratingsForNext7Days.add(totalRatingForDay);
-			currentTime += twentyFourHoursInMilliseconds;
+		List<com.google.api.services.calendar.model.Event> events =
+				calendarEvents.getEventsWithinTimeFrame(start, end);
+		StringBuilder eventIds = new StringBuilder();
+		for (com.google.api.services.calendar.model.Event e : events) {
+			eventIds.append(e.getId());
+		}
+		return eventIds.toString();
+	}
+	
+	public String setWeatherDataForDay(WeatherData weatherData, JSONObject data, String userId, Long date) {
+		Weather w = weatherData.convertJSONObjectToWeather(data, userId, date);
+		w = weatherRepository.saveAndFlush(w);
+		return w.getWeatherId();
+	}
+	
+	public String setSocialActivityForDay(String userId, Long date) {
+		Social newSocial = new Social();
+		newSocial.setUserid(userId);
+		newSocial.setDate(date);
+		String day = convertTimeMillisToDay(date);
+		newSocial.setDay(day);
+		List<Social> socialActivityForDay = socialRepository.findByday(day);
+		
+		int totalFacebookEvents = 0, totalFacebookLikes = 0, totalFacebookTimelineUpdates = 0;
+		for (Social s : socialActivityForDay) {
+			totalFacebookEvents += s.getFacebookEvents();
+			totalFacebookLikes += s.getFacebookLikes();
+			totalFacebookTimelineUpdates += s.getFacebookTimeLineUpdates();
 		}
 		
+		newSocial.setFacebookEvents(totalFacebookEvents / socialActivityForDay.size());
+		newSocial.setFacebookLikes(totalFacebookLikes / socialActivityForDay.size());
+		newSocial.setFacebookTimeLineUpdates(totalFacebookTimelineUpdates / socialActivityForDay.size());
 		
+		newSocial = socialRepository.saveAndFlush(newSocial);
+		return newSocial.getSocialid();
+	}
+	
+	public String setSleepDataForDay(String userId, Long date) {
+		Sleep newSleep = new Sleep();
+		newSleep.setUserid(userId);
+		newSleep.setDate(date);
+		String day = convertTimeMillisToDay(date);
+		newSleep.setDay(day);
+		List<Sleep> sleepDataForDay = sleepRepository.findByday(day);
+		
+		int totalSleepLength = 0, totalSleepCycles = 0, totalSleepNoiseLevel = 0;
+		for (Sleep s : sleepDataForDay) {
+			totalSleepLength += s.getSleeplength();
+			totalSleepCycles += s.getSleepCyles();
+			totalSleepNoiseLevel += s.getNoiseLevel();
+		}
+		
+		newSleep.setSleeplength(totalSleepLength / sleepDataForDay.size());
+		newSleep.setSleepCyles(totalSleepCycles / sleepDataForDay.size());
+		newSleep.setNoiseLevel(totalSleepNoiseLevel / sleepDataForDay.size());
+		
+		newSleep = sleepRepository.saveAndFlush(newSleep);
+		return newSleep.getSleepId();
 	}
 	
 	public static void main(String[] args) {

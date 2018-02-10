@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import moodprove.http.MoodProveHttp;
+import moodprove.to.Weather;
 
 public class WeatherData {
 	
@@ -28,6 +29,22 @@ public class WeatherData {
 	public JSONObject getTodaysWeatherData() {
 		JSONArray weatherDailyArray = getDailyWeatherData();
 		return weatherDailyArray.getJSONObject(0);
+	}
+	
+	public Weather convertJSONObjectToWeather(JSONObject weatherData, String userId, Long date) {
+		Weather w = new Weather();
+		w.setUserId(userId);
+		w.setDate(date);
+		w.setSunriseTime(weatherData.getLong("sunriseTime"));
+		w.setSunsetTime(weatherData.getLong("sunsetTime"));
+		w.setPrecipIntensity(weatherData.getDouble("precipIntensity"));
+		w.setPrecipProbability(weatherData.getDouble("precipProbability"));
+		w.setPrecipType(weatherData.getString("precipType"));
+		w.setTemperature((weatherData.getInt("temperatureHigh") + weatherData.getInt("temperatureLow"))/2);
+		w.setHumidity(weatherData.getDouble("humidity"));
+		w.setCloudCover(weatherData.getDouble("cloudCover"));
+		w.setVisibility(weatherData.getInt("visibility"));
+		return w;
 	}
 	
 	public static void main(String[] args) {
