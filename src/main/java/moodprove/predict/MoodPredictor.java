@@ -13,6 +13,7 @@ import weka.core.converters.ConverterUtils;
 import moodprove.to.Sleep;
 import moodprove.to.Event;
 import moodprove.to.PastMood;
+import moodprove.to.PredictedMood;
 import moodprove.to.Weather;
 import moodprove.to.Social;
 
@@ -42,46 +43,74 @@ public class MoodPredictor {
 			"@attribute precipType STRING", "@attribute temperature REAL", "@attribute humidity REAL",
 			"@attribute cloudCover REAL", "@attribute visibility REAL"};
 	
-	private PrintWriter writer;
+	private PrintWriter writerMoodPast;
 	
-	public MoodPredictor(String fileName) {
+	private PrintWriter writerMoodPredict;
+	
+	public MoodPredictor() {
 		try {
-			this.writer = new PrintWriter(fileName, "UTF-8");
+			this.writerMoodPast = new PrintWriter(MOOD_PAST_FILE_LOCATION, "UTF-8");
+			this.writerMoodPredict = new PrintWriter(MOOD_PREDICT_FILE_LOCATION, "UTF-8");
 		}
 		catch (IOException ex) {
 			System.out.println(MoodPredictor.class.getName());
-			System.out.println("Error opening PrintWriter for " + fileName);
+			System.out.println("Error opening PrintWriter");
 		}
 	}
 
 	
-	public void writeHeadersToFiles(String fileName) {
-		writer.println(FILE_HEADER);
-		writer.println();
-		printDataType(EVENT_HEADERS);
-		printDataType(SLEEP_HEADERS);
-		printDataType(SOCIAL_HEADERS);
-		printDataType(WEATHER_HEADERS);
-		writer.println();
-		writer.println();
-		writer.println("@data");
+	public void writeHeadersToMoodPast() {
+		writerMoodPast.println(FILE_HEADER);
+		writerMoodPast.println();
+		printDataType(writerMoodPast, EVENT_HEADERS);
+		printDataType(writerMoodPast, SLEEP_HEADERS);
+		printDataType(writerMoodPast, SOCIAL_HEADERS);
+		printDataType(writerMoodPast, WEATHER_HEADERS);
+		writerMoodPast.println("@attribute mood REAL");
+		writerMoodPast.println();
+		writerMoodPast.println("@data");
 	}
 	
-	private void printDataType(String[] dataType) {
+	public void writeHeadersToMoodPredict() {
+		writerMoodPredict.println(FILE_HEADER);
+		writerMoodPredict.println();
+		printDataType(writerMoodPredict, EVENT_HEADERS);
+		printDataType(writerMoodPredict, SLEEP_HEADERS);
+		printDataType(writerMoodPredict, SOCIAL_HEADERS);
+		printDataType(writerMoodPredict, WEATHER_HEADERS);
+		writerMoodPredict.println("@attribute mood REAL");
+		writerMoodPredict.println();
+		writerMoodPredict.println("@data");
+	}
+	
+	private void printDataType(PrintWriter writer, String[] dataType) {
 		for (String s : dataType) {
 			writer.println(s);
 		}
 	}
 	
-	public void writePredictiveData(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PastMood pastMood) {
+	public void writePredictiveDataToPastMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PastMood pastMood) {
 		int eventRatings = getTotalEventRatings(events);
-		writer.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
+		writerMoodPast.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
 				sleepData.getNoiseLevel(), socialData.getFacebookLikes(), socialData.getFacebookEvents(), socialData.getFacebookTimeLineUpdates(),
 				weatherData.getSunriseTime(), weatherData.getSunsetTime(), weatherData.getPrecipIntensity(), weatherData.getPrecipProbablity(),
 				weatherData.getPrecipType(), weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
 				weatherData.getVisibility(), pastMood.getPrediction()));
 	}
 	
+	public void writePredictiveDataToPastMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PredictedMood predictedMood) {
+		int eventRatings = getTotalEventRatings(events);
+		writerMoodPredict.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %s", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
+				sleepData.getNoiseLevel(), socialData.getFacebookLikes(), socialData.getFacebookEvents(), socialData.getFacebookTimeLineUpdates(),
+				weatherData.getSunriseTime(), weatherData.getSunsetTime(), weatherData.getPrecipIntensity(), weatherData.getPrecipProbablity(),
+				weatherData.getPrecipType(), weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
+				weatherData.getVisibility(), "?"));
+	}
+	
+	
+	
+	// Event rating should 0 to indicate no event is
+	// happening on the specific day
 	public int getTotalEventRatings(List<Event> events) {
 		int sum = 0;
 		for (Event e : events) {
@@ -90,8 +119,9 @@ public class MoodPredictor {
 		return sum;
 	}
 	
-	public void closeWriter() {
-		writer.close();
+	public void closeWriters() {
+		writerMoodPast.close();
+		writerMoodPredict.close();
 	}
 	
 	public List<Long> predict() {

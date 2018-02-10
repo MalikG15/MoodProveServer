@@ -69,21 +69,8 @@ public class MoodProveCronJob extends TimerTask {
 			   // for sleep and facebook activity
 			   setPredictedToPastMood(u.getUserid(), oldestPredicted, currentTime - (86400*1000));
 		   }
-		   
-		  /*for (int x = 0; x < 7; x++) {
-			  PredictedMood newMood = new PredictedMood();
-			  List<Event> events = findEventsForDay(userId, currentTime)
-		  }
-		   
-		   // get event rating from current time to 24 hours later, for 7 days
-		   List<Integer> getRatings = findEventsForNext7Days(u.getUserid(), currentTime);
-		   // get weather from current time to 24 hours later, for 7 days
-		   
-		   // get average social for each day
-		   
-		   // get average sleep for each day*/
-		   
-		   
+		   predictedMoodRepository.deleteAllByuserid(u.getUserid());
+		   setPredictionDataForNext7Days(u, currentTime);
 	   }
 	   
 	}
@@ -196,15 +183,16 @@ public class MoodProveCronJob extends TimerTask {
 		}
 	} 
 	
-	// Event ratings should be 1 - 10
-	// 0 should indicate no events happening at all for that day
 	public String findEventsForDay(String userId, Long start, Long end) {
 		GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
 		List<com.google.api.services.calendar.model.Event> events =
 				calendarEvents.getEventsWithinTimeFrame(start, end);
 		StringBuilder eventIds = new StringBuilder();
 		for (com.google.api.services.calendar.model.Event e : events) {
-			eventIds.append(e.getId());
+			Event event = eventRepository.findByeventid(e.getId());
+			if (event != null) {
+				eventIds.append(e.getId());
+			}
 		}
 		return eventIds.toString();
 	}
