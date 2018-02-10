@@ -98,7 +98,7 @@ public class MoodPredictor {
 				weatherData.getVisibility(), pastMood.getPrediction()));
 	}
 	
-	public void writePredictiveDataToPastMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PredictedMood predictedMood) {
+	public void writePredictiveDataToPredictMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PredictedMood predictedMood) {
 		int eventRatings = getTotalEventRatings(events);
 		writerMoodPredict.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %s", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
 				sleepData.getNoiseLevel(), socialData.getFacebookLikes(), socialData.getFacebookEvents(), socialData.getFacebookTimeLineUpdates(),

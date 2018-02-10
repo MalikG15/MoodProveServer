@@ -1,17 +1,9 @@
 package moodprove.application;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
@@ -28,6 +20,7 @@ import moodprove.data.*;
 import moodprove.facebook.FacebookUserData;
 import moodprove.facebook.OAuthFacebook;
 import moodprove.google.GoogleCalendarEvents;
+import moodprove.predict.MoodPredictor;
 import moodprove.sleep.SleepData;
 import moodprove.to.*;
 import moodprove.weather.WeatherData;
@@ -71,6 +64,7 @@ public class MoodProveCronJob extends TimerTask {
 		   }
 		   predictedMoodRepository.deleteAllByuserid(u.getUserid());
 		   setPredictionDataForNext7Days(u, currentTime);
+		   makePredictionForNext7Days(u);
 	   }
 	   
 	}
@@ -191,7 +185,7 @@ public class MoodProveCronJob extends TimerTask {
 		for (com.google.api.services.calendar.model.Event e : events) {
 			Event event = eventRepository.findByeventid(e.getId());
 			if (event != null) {
-				eventIds.append(e.getId());
+				eventIds.append(e.getId() + ",");
 			}
 		}
 		return eventIds.toString();
@@ -247,6 +241,48 @@ public class MoodProveCronJob extends TimerTask {
 		
 		newSleep = sleepRepository.saveAndFlush(newSleep);
 		return newSleep.getSleepId();
+	}
+	
+	public void makePredictionForNext7Days(User user) {
+		String userId = user.getUserid();
+		List<PastMood> pastMood = pastMoodRepository.findAllByuserid(userId);
+		List<PredictedMood> predictedMood = predictedMoodRepository.findAllByuserid(userId);
+		MoodPredictor predictor = new MoodPredictor();
+		predictor.writeHeadersToMoodPast();
+		predictor.writeHeadersToMoodPredict();
+		for (PastMood mood : pastMood) {
+			List<Event> events = new ArrayList<>();
+			for (String s : mood.getEvents().split(",")) {
+				events.add(eventRepository.findByeventid(s));
+			}
+			predictor.writePredictiveDataToPastMood(events, 
+					sleepRepository.findBysleepid(mood.getSleepid()), 
+					socialRepository.findBysocialid(mood.getSocialId()), 
+					weatherRepository.findByweatherid(mood.getWeatherId()), 
+					mood);
+		}
+		
+		for (PredictedMood mood : predictedMood) {
+			List<Event> events = new ArrayList<>();
+			for (String s : mood.getEvents().split(",")) {
+				events.add(eventRepository.findByeventid(s));
+			}
+			predictor.writePredictiveDataToPredictMood(events, 
+					sleepRepository.findBysleepid(mood.getSleepid()), 
+					socialRepository.findBysocialid(mood.getSocialId()), 
+					weatherRepository.findByweatherid(mood.getWeatherId()), 
+					mood);
+		}
+		predictor.closeWriters();
+		// THE MOST IMPORTANT LINE OF CODE IN
+		// THIS ENTIRE PROJECT
+		List<Long> results = predictor.predict();
+		for (int index = 0; index < predictedMood.size(); index++) {
+			PredictedMood mood = predictedMood.get(index);
+			mood.setPrediction(results.get(index));
+			predictedMoodRepository.saveAndFlush(mood);
+		}
+		
 	}
 	
 	public static void main(String[] args) {

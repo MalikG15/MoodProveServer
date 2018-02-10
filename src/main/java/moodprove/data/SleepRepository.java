@@ -9,6 +9,7 @@ import moodprove.to.Sleep;
 
 public interface SleepRepository extends JpaRepository<Sleep, Long> {
 	public Sleep findBydate(Long date);
+	public Sleep findBysleepid(String sleepId);
 	public List<Sleep> findByday(String day);
 	@Transactional
     void deleteBysleepid(String sleepid);

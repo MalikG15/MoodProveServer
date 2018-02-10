@@ -9,6 +9,7 @@ import moodprove.to.PredictedMood;;
 
 public interface PredictedMoodRepository extends JpaRepository<PredictedMood, Long> {
 	public PredictedMood findBydateLessThan(Long date);
+	public List<PredictedMood> findAllByuserid(String userId);
 	@Transactional
     void deleteAllByuserid(String userid);
 }

@@ -34,7 +34,7 @@ public class PredictedMood {
 	  @Column(name = "weatherid")
 	  private String weatherId;
 	  @Column(name = "prediction")
-	  private Integer prediction;
+	  private Long prediction;
 	  
 	public String getPredictedMoodId() {
 		return predictedMoodId;
@@ -72,19 +72,20 @@ public class PredictedMood {
 	public void setWeatherId(String weatherId) {
 		this.weatherId = weatherId;
 	}
-	public Integer getPrediction() {
-		return prediction;
-	}
-	public void setPrediction(Integer prediction) {
-		this.prediction = prediction;
-	}
 	public String getSleepid() {
 		return sleepid;
 	}
 	public void setSleepid(String sleepid) {
 		this.sleepid = sleepid;
 	}
-
+	public Long getPrediction() {
+		return prediction;
+	}
+	public void setPrediction(Long prediction) {
+		this.prediction = prediction;
+	}
+	
+	
 	  
 
 

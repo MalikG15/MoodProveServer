@@ -12,4 +12,5 @@ public interface SocialRepository extends JpaRepository<Social, Long>  {
     void deleteBysocialid(String socialid);
 	
 	List<Social> findByday(String day);
+	public Social findBysocialid(String socialId);
 }
