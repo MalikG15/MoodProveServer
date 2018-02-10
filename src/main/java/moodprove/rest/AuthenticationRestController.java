@@ -33,7 +33,7 @@ public class AuthenticationRestController {
 		try {
 			GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
 			if (!calendarEvents.isTokenValid()) {
-				if (!user.googleOAuthConfirmationLinkExists()) {
+				if (user.getGoogleOAuthLink().isEmpty()) {
 					calendarEvents.startGoogleCalendarAuthenticationThread();
 					Thread.sleep(500);
 				}

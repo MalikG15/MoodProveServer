@@ -11,4 +11,5 @@ import moodprove.to.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	User findByuserid(String userId);
 	User findByEmailAndPassword(String email, String password);
+	String findfacebookAccessTokenByuserid(String userid);
 }

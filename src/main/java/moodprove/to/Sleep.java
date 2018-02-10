@@ -21,7 +21,9 @@ public class Sleep {
 	  @GenericGenerator(name = "uuid", strategy = "uuid2")
 	  @GeneratedValue(generator = "uuid")
 	  @Column(name = "sleepid")
-	  private String sleepId;
+	  private String sleepid;
+	  @Column(name = "userid")
+	  private String userid;
 	  @Column(name = "date")
 	  private Long date;
 	  @Column(name = "day")
@@ -35,10 +37,10 @@ public class Sleep {
 
 	  
 	public String getSleepId() {
-		return sleepId;
+		return sleepid;
 	}
 	public void setSleepId(String sleepId) {
-		this.sleepId = sleepId;
+		this.sleepid = sleepId;
 	}
 	public Long getDate() {
 		return date;
@@ -63,6 +65,18 @@ public class Sleep {
 	}
 	public void setNoiseLevel(Integer noiseLevel) {
 		this.noiseLevel = noiseLevel;
+	}
+	public String getDay() {
+		return day;
+	}
+	public void setDay(String day) {
+		this.day = day;
+	}
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
 	}
 
 }

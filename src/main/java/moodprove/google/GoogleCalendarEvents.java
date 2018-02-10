@@ -81,6 +81,10 @@ public class GoogleCalendarEvents {
 		}).start();
 	}
 	
+	public int getRatingsForEventsWithTimeFrame(Long start, Long end) {
+		
+	}
+
 	public void getCalendarEvents() throws IOException {
 		Calendar calendar = buildCalendar();
 		if (calendar == null) return;

@@ -29,29 +29,22 @@ public class User {
 	private Long facebookTokenExpire;
 	@Column(name = "googleoauthlink", length = 500)
 	private String googleOAuthLink;
-	@Column(name = "timeofdailyprediction")
-	private Long timeOfDailyPrediction;
-	@Column(name = "timeoflastprediction")
-	private Long timeOfLastPrediction;
-	@Column(name = "timeofcheckin")
-	private Long timeOfCheckIn;
-	@Column(name = "timeoflastcheckin")
-	private Long timeOfLastCheckIn;
+	@Column(name = "scheduledtimeofprediction")
+	private String scheduledTimeOfPrediction;
 	@Column(name = "longitude")
 	private Double longitude;
 	@Column(name = "latitude")
 	private Double latitude;
-	  
 	public String getUserid() {
 		return userid;
 	}
 	public void setUserid(String userid) {
 		this.userid = userid;
 	}
-	public String getUsername() {
+	public String getEmail() {
 		return email;
 	}
-	public void setUsername(String email) {
+	public void setEmail(String email) {
 		this.email = email;
 	}
 	public String getPassword() {
@@ -66,15 +59,37 @@ public class User {
 	public void setFacebookAccessToken(String facebookAccessToken) {
 		this.facebookAccessToken = facebookAccessToken;
 	}
-	public String getGoogleOauthLink() {
+	public Long getFacebookTokenExpire() {
+		return facebookTokenExpire;
+	}
+	public void setFacebookTokenExpire(Long facebookTokenExpire) {
+		this.facebookTokenExpire = facebookTokenExpire;
+	}
+	public String getGoogleOAuthLink() {
 		return googleOAuthLink;
 	}
-	public void setGoogleOauthLink(String googleOauthLink) {
-		this.googleOAuthLink = googleOauthLink;
+	public void setGoogleOAuthLink(String googleOAuthLink) {
+		this.googleOAuthLink = googleOAuthLink;
 	}
-	public boolean googleOAuthConfirmationLinkExists() {
-		return googleOAuthLink != null;
+	public Double getLongitude() {
+		return longitude;
 	}
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+	public Double getLatitude() {
+		return latitude;
+	}
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+	public String getScheduledTimeOfPrediction() {
+		return scheduledTimeOfPrediction;
+	}
+	public void setScheduledTimeOfPrediction(String scheduledTimeOfPrediction) {
+		this.scheduledTimeOfPrediction = scheduledTimeOfPrediction;
+	}
+	
 	  
 
 }

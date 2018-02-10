@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import moodprove.data.UserRepository;
+import moodprove.application.MoodProveCronJob;
 
 @EnableJpaRepositories(basePackages = "moodprove")
 @ComponentScan(basePackages = "moodprove")
@@ -20,7 +20,7 @@ import moodprove.data.UserRepository;
 public class Application implements CommandLineRunner {
 	
 	 @Autowired
-	 UserRepository userRepo;
+	 MoodProveCronJob moodProveCronJob;
 
 	public static void main(final String[] args) {
 	   SpringApplication.run(Application.class, args);
@@ -28,11 +28,7 @@ public class Application implements CommandLineRunner {
 	  
 	public void run(String... args) throws Exception {
 		// TODO Auto-generated method stub
-		test();
-		//System.out.println("haha");
+		
 	}
-	
-	public void test() {
-		if (userRepo != null) System.out.println("haha");
-	}
+
 }

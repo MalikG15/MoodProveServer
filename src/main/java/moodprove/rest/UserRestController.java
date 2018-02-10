@@ -23,7 +23,7 @@ public class UserRestController {
 	@RequestMapping("/create")
 	public String createNewUser(@RequestParam("email") String email, @RequestParam("password") String password) {
 		User newUser = new User();
-		newUser.setUsername(email);
+		newUser.setEmail(email);
 		newUser.setPassword(password);
 		userRepo.saveAndFlush(newUser);
 		return (userRepo.findByEmailAndPassword(email, password)).getUserid();

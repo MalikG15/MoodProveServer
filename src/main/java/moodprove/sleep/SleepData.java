@@ -12,6 +12,7 @@ import com.google.api.services.calendar.CalendarScopes;
 
 import moodprove.google.OAuthGoogle;
 import moodprove.http.MoodProveHttp;
+import moodprove.to.Sleep;
 
 public class SleepData {
 	
@@ -37,11 +38,28 @@ public class SleepData {
     	}
 	}
 	
-	public JSONArray getSleepData(Long afterTimestamp) {
+	
+	public Sleep getSleepData(Long afterTimestamp) {
 		try {
 			Credential credential = oauthGoogle.authorize(userId);
 			JSONObject sleepCloudData = new JSONObject(MoodProveHttp.executeGet(SLEEP_CLOUD_API_CALL + afterTimestamp, credential.getAccessToken()));
-			return sleepCloudData.getJSONArray("sleeps");
+			JSONArray sleepData = sleepCloudData.getJSONArray("sleeps");
+			Sleep sleepRecord = new Sleep();
+			int sleepCycles = 0, sleepNoiseLevel = 0, sleepLength = 0;
+			for (int x = 0; x < sleepData.length(); x++) {
+				JSONObject current = sleepData.getJSONObject(0);
+				sleepLength += current.getInt("lengthMinutes");
+				sleepNoiseLevel += current.getInt("noiseLevel");
+				sleepCycles += current.getInt("cycles");
+			}
+			// Set average noise level
+			sleepRecord.setNoiseLevel(sleepNoiseLevel / sleepData.length());
+			// Set average sleep cycles
+			sleepRecord.setSleepCyles(sleepCycles / sleepData.length());
+			// Set total time spent slept
+			sleepRecord.setSleeplength(sleepLength);
+			
+			return sleepRecord;
 		}
 		catch (IOException ex) {
 			System.out.println(SleepData.class.getName());

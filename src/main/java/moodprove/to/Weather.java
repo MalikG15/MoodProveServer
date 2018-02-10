@@ -117,5 +117,11 @@ public class Weather {
 	public void setVisibility(Integer visibility) {
 		this.visibility = visibility;
 	}
+	public Double getPrecipProbability() {
+		return precipProbability;
+	}
+	public void setPrecipProbability(Double precipProbability) {
+		this.precipProbability = precipProbability;
+	}
 	
 }

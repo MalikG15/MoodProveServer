@@ -29,11 +29,11 @@ public class Social {
 	  @Column(name = "day")
 	  private String day;
 	  @Column(name = "facebooklikes")
-	  private Long facebookLikes;
+	  private Integer facebookLikes;
 	  @Column(name = "facebookevents")
-	  private Long facebookEvents;
+	  private Integer facebookEvents;
 	  @Column(name = "facebooktimelineupdates")
-	  private Long facebookTimeLineUpdates;
+	  private Integer facebookTimeLineUpdates;
 
 	public String getSocialid() {
 		return socialid;
@@ -59,22 +59,22 @@ public class Social {
 	public void setDay(String day) {
 		this.day = day;
 	}
-	public Long getFacebookLikes() {
+	public Integer getFacebookLikes() {
 		return facebookLikes;
 	}
-	public void setFacebookLikes(Long facebookLikes) {
+	public void setFacebookLikes(Integer facebookLikes) {
 		this.facebookLikes = facebookLikes;
 	}
-	public Long getFacebookEvents() {
+	public Integer getFacebookEvents() {
 		return facebookEvents;
 	}
-	public void setFacebookEvents(Long facebookEvents) {
+	public void setFacebookEvents(Integer facebookEvents) {
 		this.facebookEvents = facebookEvents;
 	}
-	public Long getFacebookTimeLineUpdates() {
+	public Integer getFacebookTimeLineUpdates() {
 		return facebookTimeLineUpdates;
 	}
-	public void setFacebookTimeLineUpdates(Long facebookTimeLineUpdates) {
+	public void setFacebookTimeLineUpdates(Integer facebookTimeLineUpdates) {
 		this.facebookTimeLineUpdates = facebookTimeLineUpdates;
 	}
 	  

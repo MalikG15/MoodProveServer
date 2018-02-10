@@ -27,8 +27,8 @@ public class PredictedMood {
 	  // display to the user what events they did this day
 	  @Column(name = "events", length = 1000)
 	  private String events;
-	  @Column(name = "sleephours")
-	  private Long sleephours;
+	  @Column(name = "sleepid")
+	  private String sleepid;
 	  @Column(name = "socialid")
 	  private String socialId;
 	  @Column(name = "weatherid")
@@ -60,12 +60,6 @@ public class PredictedMood {
 	public void setEvents(String events) {
 		this.events = events;
 	}
-	public Long getSleephours() {
-		return sleephours;
-	}
-	public void setSleephours(Long sleephours) {
-		this.sleephours = sleephours;
-	}
 	public String getSocialId() {
 		return socialId;
 	}
@@ -83,6 +77,12 @@ public class PredictedMood {
 	}
 	public void setPrediction(Integer prediction) {
 		this.prediction = prediction;
+	}
+	public String getSleepid() {
+		return sleepid;
+	}
+	public void setSleepid(String sleepid) {
+		this.sleepid = sleepid;
 	}
 
 	  
