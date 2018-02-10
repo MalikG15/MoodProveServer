@@ -2,6 +2,7 @@ package moodprove.application;
 
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -22,6 +23,7 @@ import com.restfb.Version;
 import moodprove.data.*;
 import moodprove.facebook.FacebookUserData;
 import moodprove.facebook.OAuthFacebook;
+import moodprove.google.GoogleCalendarEvents;
 import moodprove.sleep.SleepData;
 import moodprove.to.*;
 
@@ -44,11 +46,7 @@ public class MoodProveCronJob extends TimerTask {
 	private WeatherRepository weatherRepository;
 	
 	private static final String[] DAYS_OF_WEEK = new String[] {"Sun", "Mon", "Tu", "Wed", "Thu", "Fri", "Sat"};
-	
-	public static void startJob() {
-		System.out.println("happy");
-	}
-	
+
 	@Override
 	public void run() {
 	   Long currentTime = System.currentTimeMillis();
@@ -68,6 +66,7 @@ public class MoodProveCronJob extends TimerTask {
 		   }
 		   
 		   // get event rating from current time to 24 hours later, for 7 days
+		   List<Integer> getRatings = findEventsForNext7Days(u.getUserid(), currentTime);
 		   
 		   // get weather from current time to 24 hours later, for 7 days
 		   
@@ -81,6 +80,7 @@ public class MoodProveCronJob extends TimerTask {
 	public static String convertTimeMillisToHour(Long timeMillis) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeMillis);
+	
 
 		int mHour = calendar.get(Calendar.HOUR);
 		return String.format("%d:00", mHour);
@@ -102,17 +102,25 @@ public class MoodProveCronJob extends TimerTask {
 		newPastMood.setPrediction(oldestPredicted.getPrediction());
 		
 		
-		Sleep sleepRecord = changeRecentSleepData(userId, oldestPredicted, twentyFourHoursBefore);
+		// Check token validity before retrieving data
+		SleepData sleepData = new SleepData(userId);
+		Sleep sleepRecord = null;
+		if (sleepData.isTokenValid()) {
+			sleepRecord = changeRecentSleepData(userId, oldestPredicted, twentyFourHoursBefore, sleepData);
+		}
 		
+		// Check token validity before retrieving data 
 		String fbToken = userRepo.findfacebookAccessTokenByuserid(userId);
 		Social socialRecord = null;
 		if (System.currentTimeMillis() < OAuthFacebook.getTokenExpirationTime(fbToken)) {
 			socialRecord = changeRecentSocialData(userId, oldestPredicted, twentyFourHoursBefore, fbToken);
 		}
 
+		// If data is null, then we do not change from averages
+		if (sleepRecord != null) newPastMood.setSleepid(sleepRecord.getSleepId());
+		else newPastMood.setSocialId(oldestPredicted.getSleepid());
 		
-		newPastMood.setSleepid(sleepRecord.getSleepId());
-		
+		// If data is null, then we do not change from averages
 		if (socialRecord != null) newPastMood.setSocialId(socialRecord.getSocialid());
 		else newPastMood.setSocialId(oldestPredicted.getSocialId());
 		
@@ -120,9 +128,8 @@ public class MoodProveCronJob extends TimerTask {
 		pastMoodRepo.saveAndFlush(newPastMood);
 	}
 	
-	public Sleep changeRecentSleepData(String userId, PredictedMood oldestPredicted, Long twentyFourHoursBefore) {
+	public Sleep changeRecentSleepData(String userId, PredictedMood oldestPredicted, Long twentyFourHoursBefore, SleepData data) {
 		// Retrieving most recent sleepRecord
-		SleepData data = new SleepData(userId);
 		Sleep sleepRecord = data.getSleepData(twentyFourHoursBefore);
 		sleepRecord.setUserid(userId);
 		sleepRecord.setDay(convertTimeMillisToDay(twentyFourHoursBefore));
@@ -155,6 +162,32 @@ public class MoodProveCronJob extends TimerTask {
 		socialRepository.deleteBysocialid(oldestPredicted.getSocialId());
 		
 		return socialRecord;
+	}
+	
+	// Event ratings should be 1 - 10
+	// 0 should indicate no events happening at all for that day
+	public List<Integer> findEventsForNext7Days(String userId, Long currentTime) {
+		GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
+		Long twentyFourHoursInMilliseconds = Long.valueOf(86400*1000);
+		List<Integer> ratingsForNext7Days = new ArrayList<>();
+		for (int x = 0; x < 7; x++) {
+			int totalRatingForDay = 0;
+			List<com.google.api.services.calendar.model.Event> events = 
+					calendarEvents.getEventsWithinTimeFrame(currentTime, currentTime + twentyFourHoursInMilliseconds);
+			for (com.google.api.services.calendar.model.Event e : events) {
+				Event event = eventRepository.findByeventid(e.getId());
+				if (event != null) {
+					totalRatingForDay += event.getRating();
+				}
+				// Adding 5 as that is the base addition, if the 
+				// event has not been rated yet
+				else totalRatingForDay += 5;
+			}
+			ratingsForNext7Days.add(totalRatingForDay);
+			currentTime += twentyFourHoursInMilliseconds;
+		}
+		
+		
 	}
 	
 	public static void main(String[] args) {

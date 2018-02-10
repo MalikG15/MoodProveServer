@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.calendar.CalendarScopes;
 
+import moodprove.google.GoogleCalendarEvents;
 import moodprove.google.OAuthGoogle;
 import moodprove.http.MoodProveHttp;
 import moodprove.to.Sleep;
@@ -38,6 +39,17 @@ public class SleepData {
     	}
 	}
 	
+	 public boolean isTokenValid() {
+		try {
+			oauthGoogle.isGoogleTokenValid(userId);
+		}
+		catch (IOException ex) {
+			System.out.println(SleepData.class.getName());
+			System.out.println("Could not check if token is valid.");
+		}
+		return false;
+	 }
+	
 	
 	public Sleep getSleepData(Long afterTimestamp) {
 		try {
@@ -56,8 +68,8 @@ public class SleepData {
 			sleepRecord.setNoiseLevel(sleepNoiseLevel / sleepData.length());
 			// Set average sleep cycles
 			sleepRecord.setSleepCyles(sleepCycles / sleepData.length());
-			// Set total time spent slept
-			sleepRecord.setSleeplength(sleepLength);
+			// Set average time spent slept
+			sleepRecord.setSleeplength(sleepLength / sleepData.length());
 			
 			return sleepRecord;
 		}

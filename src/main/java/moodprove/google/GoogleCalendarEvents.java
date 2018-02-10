@@ -49,8 +49,15 @@ public class GoogleCalendarEvents {
     	}
     }
     
-    public boolean isTokenValid() throws IOException {
-    	return oauthGoogle.isGoogleTokenValid(userId);
+    public boolean isTokenValid() {
+    	try {
+    		oauthGoogle.isGoogleTokenValid(userId);
+    	}
+    	catch (IOException ex) {
+    		System.out.println(GoogleCalendarEvents.class.getName());
+ 			System.out.println("Could not check if token is valid.");
+    	}
+    	return false;
     }
 	
     // The credentials used for calendar are compatible with SleepCloud API storage
@@ -64,7 +71,7 @@ public class GoogleCalendarEvents {
 		}
 		catch (IOException ex) {
 			System.out.println(GoogleCalendarEvents.class.getName());
-    		System.out.println("There was getting credential for Google Calendar Events");
+    		System.out.println("There was an error getting credential for Google Calendar Events");
 		}
 		
 		return null;
@@ -81,8 +88,26 @@ public class GoogleCalendarEvents {
 		}).start();
 	}
 	
-	public int getRatingsForEventsWithTimeFrame(Long start, Long end) {
+	public List<Event> getEventsWithinTimeFrame(Long start, Long end) {
+		Calendar calendar = buildCalendar();
+	
+		try {
+			Events events = calendar.events().list("primary")
+	            .setMaxResults(10)
+	            .setTimeMin(new DateTime(start))
+	            .setTimeMax(new DateTime(end))
+	            .setOrderBy("startTime")
+	            .setSingleEvents(true)
+	            .execute();
+			
+			return events.getItems();
+		}
+		catch (IOException ex) {
+			System.out.println(GoogleCalendarEvents.class.getName());
+    		System.out.println("There was an error getting events.");
+		}
 		
+		return null;
 	}
 
 	public void getCalendarEvents() throws IOException {

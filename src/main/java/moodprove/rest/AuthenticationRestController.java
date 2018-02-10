@@ -44,11 +44,6 @@ public class AuthenticationRestController {
 			}
 			return OAuthGoogle.getAUTHENTICATION_STILL_VALID_RESPONSE().toString();
 		}
-		catch (IOException ex) {
-			System.out.println(AuthenticationRestController.class.getName());
-			System.out.println("Retrieving the Google access token failed.");
-			return OAuthGoogle.getERROR_RETRIEVING_TOKEN().toString();
-		}
  		catch (InterruptedException ex) {
  			System.out.println(OAuthGoogle.class.getName());
  			System.out.println("The main thread failed to sleep");
