@@ -1,5 +1,6 @@
 package moodprove.rest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -20,9 +21,27 @@ public class MoodRestController {
 	PastMoodRepository pastMoodRepository;
 	
 	
-	@RequestMapping("/before")
-	public String getMoodBefore(@RequestParam("userid") String userId, @RequestParam("timestamp") Long timestamp) {
-		List<PastMood> pastMoodBefore = pastMoodRepository.findFirst8ByuseridAndDateLessThan(userId, timestamp);
+	@RequestMapping("/beforeOrAfter")
+	public String getMoodBeforeOrAfter(@RequestParam("userid") String userId, @RequestParam("timestamp") Long timestamp,
+			@RequestParam("type") String type) {
+		List<PastMood> pastMoodBefore = new ArrayList<>();
+		if (type.equals("before")) {
+			pastMoodBefore = pastMoodRepository.findFirst8ByuseridAndDateLessThan(userId, timestamp);
+		}
+		else if (type.equals("after")) {
+			pastMoodBefore = pastMoodRepository.findFirst8ByuseridAndDateGreaterThan(userId, timestamp);
+		}
+		else {
+			return "Request Invalid";
+		}
+		
+		JSONObject finalData = new JSONObject();
+		
+		if (pastMoodBefore.size() == 0) {
+			finalData.put("data", "No Valid Data");
+			return finalData.toString();
+		}
+		
 		JSONArray pastMoodBeforeArray = new JSONArray();
 		for (PastMood mood : pastMoodBefore) {
 			JSONObject data = new JSONObject();
@@ -30,7 +49,7 @@ public class MoodRestController {
 			data.put("mood", mood.getPrediction());
 			pastMoodBeforeArray.put(data);
 		}
-		JSONObject finalData = new JSONObject();
+		
 		finalData.put("data", pastMoodBeforeArray);
 		
 		return finalData.toString();
