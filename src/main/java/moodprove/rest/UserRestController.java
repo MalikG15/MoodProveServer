@@ -1,5 +1,10 @@
 package moodprove.rest;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +55,8 @@ public class UserRestController {
 		u.setEmail(email);
 		u.setPassword(password);
 		u.setScheduledTimeOfPrediction(timeOfCheckIn);
-		u.setNewUserCheckInTime(System.currentTimeMillis());
+		// Calling auxiliary function
+		u.setNewUserCheckInTime(getNextDayCheckIn(timeOfCheckIn));
 		u = userRepo.saveAndFlush(u);
 		return String.format("{\"result\": \"%s\"}", u.getUserid());
 	}
@@ -63,5 +69,33 @@ public class UserRestController {
 		obj.put("userid", u.getUserid());
 		obj.put("name", u.getName());
 		return obj.toString();
+	}
+	
+	// Could possible find a better location for this method
+	public static Long getNextDayCheckIn(String timeOfCheckIn) {
+		// Get a string representation of current time plus 24 hours
+		Long twentyFourHoursLaterFromNow = System.currentTimeMillis() + Long.valueOf(86400000);
+		Date twentyFourHoursLaterFromNowDate = new Date(twentyFourHoursLaterFromNow);
+				
+		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+		String nextCheckInDay = df.format(twentyFourHoursLaterFromNowDate);
+		// The point of 'nextCheckInDay' is to get the next day of when they sign in
+		// as that is the earliest point at which they can check in.
+		// However, the time now plus 24 hours may not be the actual time of designated
+		// check in so I date the next day data and set the next day string to the time
+		// given. That way I get the correct time of check in.
+		// The timeOfCheckIn handed in has to be changed as it comes with AM and PM, and
+		// we don't need that, then we place it in the nextday string;
+		timeOfCheckIn = timeOfCheckIn.substring(0, timeOfCheckIn.length() - 3);
+		Date nextCheckInTime = new Date();
+		try {
+			nextCheckInTime = df.parse(String.format(nextCheckInDay + " %s", timeOfCheckIn));
+		}
+		catch (ParseException ex) {
+			System.out.println(UserRestController.class.getName());
+			System.out.println("Could not parse the given string to get next check in");
+		}
+		
+		return nextCheckInTime.getTime();
 	}
 }

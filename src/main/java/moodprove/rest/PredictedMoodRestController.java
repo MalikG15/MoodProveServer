@@ -22,9 +22,14 @@ public class PredictedMoodRestController {
 	DateFormat dateFormatter = new SimpleDateFormat("MMM dd HH");  
 	
 	@RequestMapping("/getCheckInInterval")
-	public String getCheckInInterval(@RequestParam("userid") String userId) {
+	public String getCheckInInterval(@RequestParam("userid") String userId, 
+			@RequestParam("timestamp") Long timestamp) {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
+		if (timestamp > u.getNewUserCheckInTime()) {
+			u.setNewUserCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
+			u = userRepo.saveAndFlush(u);
+		}
 		Long dayInMilliseconds = Long.valueOf(86400000);
 		Long anHourInMilliseconds = Long.valueOf(3600000);
 		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserCheckInTime() + dayInMilliseconds + anHourInMilliseconds);
@@ -40,6 +45,10 @@ public class PredictedMoodRestController {
 			@RequestParam("mood") Integer mood) {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
+		if (timestamp > u.getNewUserCheckInTime()) {
+			u.setNewUserCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
+			u = userRepo.saveAndFlush(u);
+		}
 		Long dayInMilliseconds = Long.valueOf(86400000);
 		Long anHourInMilliseconds = Long.valueOf(3600000);
 		Date dateCheckInHourAfter =  new Date(u.getNewUserCheckInTime() + dayInMilliseconds + anHourInMilliseconds);
