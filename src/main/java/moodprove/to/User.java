@@ -19,6 +19,8 @@ public class User {
 	@GeneratedValue(generator = "uuid")
 	@Column(name = "userid")
 	private String userid;
+	@Column(name = "name")
+	private String name;
 	@Column(name = "email")
 	private String email;
 	@Column(name = "password")
@@ -88,6 +90,12 @@ public class User {
 	}
 	public void setScheduledTimeOfPrediction(String scheduledTimeOfPrediction) {
 		this.scheduledTimeOfPrediction = scheduledTimeOfPrediction;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	  

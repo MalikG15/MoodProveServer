@@ -33,7 +33,7 @@ public class AuthenticationRestController {
 		try {
 			GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
 			if (!calendarEvents.isTokenValid()) {
-				if (user.getGoogleOAuthLink().isEmpty()) {
+				if (user.getGoogleOAuthLink() == null || user.getGoogleOAuthLink().isEmpty()) {
 					calendarEvents.startGoogleCalendarAuthenticationThread();
 					Thread.sleep(500);
 				}
@@ -69,5 +69,17 @@ public class AuthenticationRestController {
 		
 		return String.format(OAuthFacebook.getOauthSuccessReponseHtml(), t.getString("access_token"));
 	}
+	
+	@RequestMapping("/facebook/saveToken")
+	public String saveFacebookToken(@RequestParam("userid") String userId, @RequestParam("token") String token) {
+		User u = userRepo.findByuserid(userId);
+		String fbExtendedAccessToken = OAuthFacebook.getExtendedAccessToken(token);
+		Long fbExpirationTime = OAuthFacebook.getTokenExpirationTime(fbExtendedAccessToken);
+		u.setFacebookAccessToken(fbExtendedAccessToken);
+		u.setFacebookTokenExpire(fbExpirationTime);
+		userRepo.saveAndFlush(u);
+		return "{\"result\": \"success\"}";
+	}
+	
 
 }
