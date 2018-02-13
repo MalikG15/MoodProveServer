@@ -50,6 +50,7 @@ public class UserRestController {
 		u.setEmail(email);
 		u.setPassword(password);
 		u.setScheduledTimeOfPrediction(timeOfCheckIn);
+		u.setNewUserCheckInTime(System.currentTimeMillis());
 		u = userRepo.saveAndFlush(u);
 		return String.format("{\"result\": \"%s\"}", u.getUserid());
 	}

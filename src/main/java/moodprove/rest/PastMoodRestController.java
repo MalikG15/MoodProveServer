@@ -15,7 +15,7 @@ import moodprove.to.PastMood;
 
 @RequestMapping("/mood")
 @RestController
-public class MoodRestController {
+public class PastMoodRestController {
 	
 	@Autowired
 	PastMoodRepository pastMoodRepository;
