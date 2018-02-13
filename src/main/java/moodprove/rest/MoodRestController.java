@@ -24,6 +24,7 @@ public class MoodRestController {
 	@RequestMapping("/beforeOrAfter")
 	public String getMoodBeforeOrAfter(@RequestParam("userid") String userId, @RequestParam("timestamp") Long timestamp,
 			@RequestParam("type") String type) {
+		JSONObject finalData = new JSONObject();
 		List<PastMood> pastMoodBefore = new ArrayList<>();
 		if (type.equals("before")) {
 			pastMoodBefore = pastMoodRepository.findFirst8ByuseridAndDateLessThan(userId, timestamp);
@@ -32,10 +33,9 @@ public class MoodRestController {
 			pastMoodBefore = pastMoodRepository.findFirst8ByuseridAndDateGreaterThan(userId, timestamp);
 		}
 		else {
-			return "Request Invalid";
+			finalData.put("data", "Request Invalid");
+			return finalData.toString();
 		}
-		
-		JSONObject finalData = new JSONObject();
 		
 		if (pastMoodBefore.size() == 0) {
 			finalData.put("data", "No Valid Data");
