@@ -21,7 +21,7 @@ public class Weather {
 	@GenericGenerator(name = "uuid", strategy = "uuid2")
 	@GeneratedValue(generator = "uuid")
 	@Column(name = "weatherid")
-	private String weatherId;
+	private String weatherid;
 	@Column(name = "userid")
 	private String userId;
 	@Column(name = "date")
@@ -46,10 +46,10 @@ public class Weather {
 	private Integer visibility;
 	
 	public String getWeatherId() {
-		return weatherId;
+		return weatherid;
 	}
 	public void setWeatherId(String weatherId) {
-		this.weatherId = weatherId;
+		this.weatherid = weatherId;
 	}
 	public String getUserId() {
 		return userId;

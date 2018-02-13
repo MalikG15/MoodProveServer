@@ -160,7 +160,10 @@ public class MoodPredictor {
 	}
 	
 	public static void main(String[] args) throws Exception {
-
+		MoodPredictor moodPredictor = new MoodPredictor();
+		moodPredictor.writeHeadersToMoodPast();
+		moodPredictor.writeHeadersToMoodPredict();
+		moodPredictor.closeWriters();
 	}
 
 }

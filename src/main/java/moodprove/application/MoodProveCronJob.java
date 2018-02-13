@@ -59,7 +59,8 @@ public class MoodProveCronJob extends TimerTask {
 		   PredictedMood oldestPredicted = predictedMoodRepository.findBydateLessThan(System.currentTimeMillis());
 		   if (oldestPredicted != null) {
 			   // going back 24 hours to retrieve data 
-			   // for sleep and facebook activity
+			   // for most recent sleep and facebook activity
+			   // and replace it from averages to improve data
 			   setPredictedToPastMood(u.getUserid(), oldestPredicted, currentTime - (86400*1000));
 		   }
 		   predictedMoodRepository.deleteAllByuserid(u.getUserid());
@@ -125,9 +126,6 @@ public class MoodProveCronJob extends TimerTask {
 		sleepRecord.setDay(convertTimeMillisToDay(twentyFourHoursBefore));
 		sleepRecord.setDate(twentyFourHoursBefore);
 		sleepRecord = sleepRepository.saveAndFlush(sleepRecord);
-				
-		/*// Retrieving again for the ID
-		sleepRecord = sleepRepository.findBydate(twentyFourHoursBefore);*/
 				
 		// Delete the predicted sleep because it is just averages
 		sleepRepository.deleteBysleepid(oldestPredicted.getSleepid());

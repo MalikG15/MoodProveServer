@@ -1,15 +1,21 @@
 @relation qdb-weka.filters.unsupervised.attribute.Remove-R1
 
-@attribute temperature numeric
-@attribute sleephours numeric
-@attribute events numeric
-@attribute day {mon, tue, wed, thur, fri, sat, sun}
-@attribute emotion numeric
-
+@attribute eventratings REAL
+@attribute sleepHours REAL
+@attribute sleepCycles REAL
+@attribute sleepNoiseLevel REAL
+@attribute facebookLikes REAL
+@attribute facebookEvents REAL
+@attribute facebookNewsFeed REAL
+@attribute sunriseTime REAL
+@attribute sunsetTime REAL
+@attribute precipIntensity REAL
+@attribute precipProbability REAL
+@attribute precipType STRING
+@attribute temperature REAL
+@attribute humidity REAL
+@attribute cloudCover REAL
+@attribute visibility REAL
+@attribute mood REAL
 
 @data
-1, 1, 1, mon, 1
-1, 2, 1, tue, 2
-2, 2, 2, wed, 3
-3, 3, 3, thur, 4
-5, 5, 2, sat, 5

@@ -19,8 +19,8 @@ import moodprove.application.MoodProveCronJob;
 @EnableAutoConfiguration
 public class Application implements CommandLineRunner {
 	
-	 @Autowired
-	 MoodProveCronJob moodProveCronJob;
+	@Autowired
+	MoodProveCronJob moodProveCronJob;
 
 	public static void main(final String[] args) {
 	   SpringApplication.run(Application.class, args);
