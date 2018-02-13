@@ -78,6 +78,7 @@ public class UserRestController {
 		Date twentyFourHoursLaterFromNowDate = new Date(twentyFourHoursLaterFromNow);
 				
 		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat formatter6 = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 		String nextCheckInDay = df.format(twentyFourHoursLaterFromNowDate);
 		// The point of 'nextCheckInDay' is to get the next day of when they sign in
 		// as that is the earliest point at which they can check in.
@@ -89,7 +90,8 @@ public class UserRestController {
 		timeOfCheckIn = timeOfCheckIn.substring(0, timeOfCheckIn.length() - 3);
 		Date nextCheckInTime = new Date();
 		try {
-			nextCheckInTime = df.parse(String.format(nextCheckInDay + " %s", timeOfCheckIn));
+			System.out.println(String.format(nextCheckInDay + " %s", timeOfCheckIn));
+			nextCheckInTime = formatter6.parse(String.format(nextCheckInDay + " %s", timeOfCheckIn));
 		}
 		catch (ParseException ex) {
 			System.out.println(UserRestController.class.getName());
@@ -97,5 +99,12 @@ public class UserRestController {
 		}
 		
 		return nextCheckInTime.getTime();
+	}
+	
+	public static void main(String[] args) {
+		SimpleDateFormat formatter6 = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+		//System.out.println(getNextDayCheckIn("5:00 AM"));
+		Date date = new Date(getNextDayCheckIn("5:00 AM"));
+		System.out.println(formatter6.format(date));
 	}
 }
