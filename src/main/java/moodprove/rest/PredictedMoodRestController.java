@@ -28,15 +28,15 @@ public class PredictedMoodRestController {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
 		System.out.println(u.getScheduledTimeOfPrediction());
-		if (timestamp >= u.getNewUserCheckInTime()) {
-			u.setNewUserCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
+		if (timestamp >= u.getNewUserNextCheckInTime()) {
+			u.setNewUserNextCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
 		Long anHourInMilliseconds = Long.valueOf(3600000);
-		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserCheckInTime() + anHourInMilliseconds);
+		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
 		JSONObject response = new JSONObject();
 		
-		response.put("checkInInterval", String.format("%s:00 - %s:00", dateFormatter.format(u.getNewUserCheckInTime()), 
+		response.put("checkInInterval", String.format("%s:00 - %s:00", dateFormatter.format(u.getNewUserNextCheckInTime()), 
 				dateFormatter.format(dateCheckInHalfHourAfter)));
 		return response.toString();
 	}
@@ -46,18 +46,20 @@ public class PredictedMoodRestController {
 			@RequestParam("mood") Integer mood) {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
-		if (timestamp >= u.getNewUserCheckInTime()) {
-			u.setNewUserCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
+		if (timestamp >= u.getNewUserNextCheckInTime()) {
+			u.setNewUserNextCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
 		Long anHourInMilliseconds = Long.valueOf(3600000);
-		Date dateCheckInHourAfter =  new Date(u.getNewUserCheckInTime() + anHourInMilliseconds);
-		Date dateCheckIn =  new Date(u.getNewUserCheckInTime());
+		Date dateCheckInHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
+		Date dateCheckIn =  new Date(u.getNewUserNextCheckInTime());
 		Date dateUserCurrent = new Date(timestamp);
 		
 		if (dateUserCurrent.after(dateCheckIn) && dateUserCurrent.before(dateCheckInHourAfter)) {
 			// Retrieve data
-			u.setNewUserCheckInTime(timestamp);
+			
+			Long aDayInMilliseconds = Long.valueOf(86400000);
+			u.setNewUserNextCheckInTime(timestamp + aDayInMilliseconds);
 			userRepo.saveAndFlush(u);
 		}
 		

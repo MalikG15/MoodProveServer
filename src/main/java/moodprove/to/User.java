@@ -37,8 +37,8 @@ public class User {
 	private Double longitude;
 	@Column(name = "latitude")
 	private Double latitude;
-	@Column(name = "newUserLastCheckInTime")
-	private Long newUserLastCheckInTime;
+	@Column(name = "newUserNextCheckInTime")
+	private Long newUserNextCheckInTime;
 	
 	public String getUserid() {
 		return userid;
@@ -100,11 +100,11 @@ public class User {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Long getNewUserCheckInTime() {
-		return newUserLastCheckInTime;
+	public Long getNewUserNextCheckInTime() {
+		return newUserNextCheckInTime;
 	}
-	public void setNewUserCheckInTime(Long newUserCheckInTime) {
-		this.newUserLastCheckInTime = newUserCheckInTime;
+	public void setNewUserNextCheckInTime(Long newUserNextCheckInTime) {
+		this.newUserNextCheckInTime = newUserNextCheckInTime;
 	}
 	
 	  
