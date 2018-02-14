@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import moodprove.data.PastMoodRepository;
 import moodprove.to.PastMood;
 
-@RequestMapping("/mood")
+@RequestMapping("/past")
 @RestController
 public class PastMoodRestController {
 	
@@ -55,6 +55,14 @@ public class PastMoodRestController {
 		finalData.put("data", pastMoodBeforeArray);
 		
 		return finalData.toString();
+	}
+	
+	@RequestMapping("/check")
+	public String checkMoodHistory(@RequestParam("userid") String userId) {
+		List<PastMood> pastMood = pastMoodRepository.findAllByuserid(userId);
+
+		System.out.println((pastMood == null || pastMood.size() < 7) ? "Insufficient" : "Sufficient");
+		return String.format("{\"data:\" \"%s\"}", (pastMood == null || pastMood.size() < 7) ? "Insufficient" : "Sufficient");
 	}
 
 }

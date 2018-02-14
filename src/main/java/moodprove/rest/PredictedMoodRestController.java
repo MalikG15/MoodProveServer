@@ -27,13 +27,15 @@ public class PredictedMoodRestController {
 			@RequestParam("timestamp") Long timestamp) {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
-		System.out.println(u.getScheduledTimeOfPrediction());
-		if (timestamp >= u.getNewUserNextCheckInTime()) {
+		//System.out.println(u.getScheduledTimeOfPrediction());
+		Long anHourInMilliseconds = Long.valueOf(3600000);
+		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
+		if (timestamp >= dateCheckInHalfHourAfter.getTime()) {
 			u.setNewUserNextCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
-		Long anHourInMilliseconds = Long.valueOf(3600000);
-		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
+		
+		
 		JSONObject response = new JSONObject();
 		
 		response.put("checkInInterval", String.format("%s:00 - %s:00", dateFormatter.format(u.getNewUserNextCheckInTime()), 
@@ -46,12 +48,12 @@ public class PredictedMoodRestController {
 			@RequestParam("mood") Integer mood) {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
-		if (timestamp >= u.getNewUserNextCheckInTime()) {
+		Long anHourInMilliseconds = Long.valueOf(3600000);
+		Date dateCheckInHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
+		if (timestamp >= dateCheckInHourAfter.getTime()) {
 			u.setNewUserNextCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
-		Long anHourInMilliseconds = Long.valueOf(3600000);
-		Date dateCheckInHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
 		Date dateCheckIn =  new Date(u.getNewUserNextCheckInTime());
 		Date dateUserCurrent = new Date(timestamp);
 		

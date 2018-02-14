@@ -74,8 +74,8 @@ public class MoodProveCronJob extends TimerTask {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeMillis);
 		int hour = calendar.get(Calendar.HOUR);
-		String pmOrAm = (calendar.get(Calendar.AM_PM) == 1) ? "PM" : "AM";
-		return String.format("%d:00%s", hour, pmOrAm);
+		//String pmOrAm = (calendar.get(Calendar.AM_PM) == 1) ? "PM" : "AM";
+		return String.format("%d:00", hour);
 	}
 	
 	private static String convertTimeMillisToDay(Long timeMillis) {

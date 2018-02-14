@@ -87,7 +87,9 @@ public class UserRestController {
 		// given. That way I get the correct time of check in.
 		// The timeOfCheckIn handed in has to be changed as it comes with AM and PM, and
 		// we don't need that, then we place it in the nextday string;
-		timeOfCheckIn = timeOfCheckIn.substring(0, timeOfCheckIn.length() - 2);
+		
+		// No need to do this anymore since AM/PM is not used
+		//timeOfCheckIn = timeOfCheckIn.substring(0, timeOfCheckIn.length() - 2);
 		Date nextCheckInTime = new Date();
 		try {
 			System.out.println(String.format(nextCheckInDay + " %s", timeOfCheckIn));
