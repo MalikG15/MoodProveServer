@@ -61,7 +61,6 @@ public class PastMoodRestController {
 	public String checkMoodHistory(@RequestParam("userid") String userId) {
 		List<PastMood> pastMood = pastMoodRepository.findAllByuserid(userId);
 
-		System.out.println((pastMood == null || pastMood.size() < 7) ? "Insufficient" : "Sufficient");
 		return String.format("{\"data:\" \"%s\"}", (pastMood == null || pastMood.size() < 7) ? "Insufficient" : "Sufficient");
 	}
 

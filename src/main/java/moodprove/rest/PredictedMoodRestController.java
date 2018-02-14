@@ -29,17 +29,24 @@ public class PredictedMoodRestController {
 		if (u == null) return null;
 		//System.out.println(u.getScheduledTimeOfPrediction());
 		Long anHourInMilliseconds = Long.valueOf(3600000);
-		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
-		if (timestamp >= dateCheckInHalfHourAfter.getTime()) {
+		Date dateCheckInHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
+		JSONObject response = new JSONObject();
+		Date dateCheckIn =  new Date(u.getNewUserNextCheckInTime());
+		Date dateUserCurrent = new Date((timestamp*1000) + 86400000);
+		if (timestamp >= dateCheckInHourAfter.getTime()) {
 			u.setNewUserNextCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
 		
+		// Do a check if they can check in now, if so send that it is time
+		if (dateUserCurrent.after(dateCheckIn) && dateUserCurrent.before(dateCheckInHourAfter)) {
+			response.put("checkInInterval", "Now");
+			return response.toString();
+		}
 		
-		JSONObject response = new JSONObject();
 		
 		response.put("checkInInterval", String.format("%s:00 - %s:00", dateFormatter.format(u.getNewUserNextCheckInTime()), 
-				dateFormatter.format(dateCheckInHalfHourAfter)));
+				dateFormatter.format(dateCheckInHourAfter)));
 		return response.toString();
 	}
 	
