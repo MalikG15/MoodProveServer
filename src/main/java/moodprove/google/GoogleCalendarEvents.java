@@ -109,5 +109,24 @@ public class GoogleCalendarEvents {
 		
 		return null;
 	}
+	
+	public List<Event> getAllEvents() {
+		Calendar calendar = buildCalendar();
+	
+		try {
+			Events events = calendar.events().list("primary")
+	            .setMaxResults(10)
+	            .setOrderBy("startTime")
+	            .setSingleEvents(true)
+	            .execute();
+			return events.getItems();
+		}
+		catch (IOException ex) {
+			System.out.println(GoogleCalendarEvents.class.getName());
+    		System.out.println("There was an error getting events.");
+		}
+		
+		return null;
+	}
 
 }
