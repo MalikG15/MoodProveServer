@@ -24,6 +24,7 @@ public class EventRestController {
 	EventRepository eventRepository;
 	
 	
+	@RequestMapping("/unratedevents")
 	public String unratedEvents(@RequestParam("userid") String userId) {
 		GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
 		List<com.google.api.services.calendar.model.Event> events = new ArrayList<>();
@@ -50,6 +51,7 @@ public class EventRestController {
 		return finalData.toString();
 	}
 	
+	@RequestMapping("/rate")
 	public void rateEvent(@RequestParam("userid") String userid, @RequestParam("eventid") String eventId, 
 			@RequestParam("date") Long date, @RequestParam("rating") Integer rating) {
 		moodprove.to.Event e = new moodprove.to.Event();
