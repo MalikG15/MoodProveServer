@@ -46,7 +46,7 @@ public class PredictedMoodRestController {
 			@RequestParam("mood") Integer mood) {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
-		if (timestamp > u.getNewUserCheckInTime()) {
+		if (timestamp >= u.getNewUserCheckInTime()) {
 			u.setNewUserCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
