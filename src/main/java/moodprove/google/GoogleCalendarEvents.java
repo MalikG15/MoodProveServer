@@ -112,7 +112,7 @@ public class GoogleCalendarEvents {
 	
 	public List<Event> getAllEvents() {
 		Calendar calendar = buildCalendar();
-	
+		
 		try {
 			Events events = calendar.events().list("primary")
 	            .setMaxResults(10)
