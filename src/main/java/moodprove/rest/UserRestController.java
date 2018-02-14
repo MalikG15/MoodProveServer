@@ -104,7 +104,8 @@ public class UserRestController {
 	public static void main(String[] args) {
 		SimpleDateFormat formatter6 = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 		//System.out.println(getNextDayCheckIn("5:00 AM"));
-		Date date = new Date(getNextDayCheckIn("5:00 AM"));
+		Date date = new Date(getNextDayCheckIn("6:00 AM"));
 		System.out.println(formatter6.format(date));
+		System.out.println(System.currentTimeMillis());
 	}
 }

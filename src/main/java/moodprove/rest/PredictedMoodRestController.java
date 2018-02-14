@@ -13,26 +13,27 @@ import org.springframework.web.bind.annotation.RestController;
 import moodprove.data.UserRepository;
 import moodprove.to.User;
 
-@RestController("/predictedmood")
+@RequestMapping("/predicted")
+@RestController
 public class PredictedMoodRestController {
 	
 	@Autowired
 	UserRepository userRepo;
 	
-	DateFormat dateFormatter = new SimpleDateFormat("MMM dd HH");  
+	SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM dd HH");  
 	
 	@RequestMapping("/getCheckInInterval")
 	public String getCheckInInterval(@RequestParam("userid") String userId, 
 			@RequestParam("timestamp") Long timestamp) {
 		User u = userRepo.findByuserid(userId);
 		if (u == null) return null;
-		if (timestamp > u.getNewUserCheckInTime()) {
+		System.out.println(u.getScheduledTimeOfPrediction());
+		if (timestamp >= u.getNewUserCheckInTime()) {
 			u.setNewUserCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
-		Long dayInMilliseconds = Long.valueOf(86400000);
 		Long anHourInMilliseconds = Long.valueOf(3600000);
-		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserCheckInTime() + dayInMilliseconds + anHourInMilliseconds);
+		Date dateCheckInHalfHourAfter =  new Date(u.getNewUserCheckInTime() + anHourInMilliseconds);
 		JSONObject response = new JSONObject();
 		
 		response.put("checkInInterval", String.format("%s:00 - %s:00", dateFormatter.format(u.getNewUserCheckInTime()), 
@@ -49,10 +50,9 @@ public class PredictedMoodRestController {
 			u.setNewUserCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
 			u = userRepo.saveAndFlush(u);
 		}
-		Long dayInMilliseconds = Long.valueOf(86400000);
 		Long anHourInMilliseconds = Long.valueOf(3600000);
-		Date dateCheckInHourAfter =  new Date(u.getNewUserCheckInTime() + dayInMilliseconds + anHourInMilliseconds);
-		Date dateCheckIn =  new Date(u.getNewUserCheckInTime() + dayInMilliseconds);
+		Date dateCheckInHourAfter =  new Date(u.getNewUserCheckInTime() + anHourInMilliseconds);
+		Date dateCheckIn =  new Date(u.getNewUserCheckInTime());
 		Date dateUserCurrent = new Date(timestamp);
 		
 		if (dateUserCurrent.after(dateCheckIn) && dateUserCurrent.before(dateCheckInHourAfter)) {
