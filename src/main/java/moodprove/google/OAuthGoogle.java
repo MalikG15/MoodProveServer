@@ -111,7 +111,7 @@ public class OAuthGoogle {
  	       if (stored != null) {
  	    	  Long expirationTimeMilliseconds = stored.getExpirationTimeMilliseconds();
  	    	  String refreshToken = stored.getRefreshToken();
- 	    	 System.out.println(stored.getAccessToken() + " is the access token.");
+ 	    	  System.out.println(stored.getAccessToken() + " is the access token.");
  	    	  if (((expirationTimeMilliseconds - Clock.SYSTEM.currentTimeMillis()) / 1000) < 60 &&
  	    			  refreshToken != null) {
  	    		  return refreshToken(userId);

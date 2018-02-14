@@ -115,7 +115,8 @@ public class GoogleCalendarEvents {
 		
 		try {
 			Events events = calendar.events().list("primary")
-	            .setMaxResults(10)
+	            .setMaxResults(50)
+	            .setTimeMin(new DateTime(System.currentTimeMillis()))
 	            .setOrderBy("startTime")
 	            .setSingleEvents(true)
 	            .execute();

@@ -16,7 +16,7 @@ import moodprove.data.EventRepository;
 import moodprove.google.GoogleCalendarEvents;
 import moodprove.to.*;
 
-@RequestMapping("/events")
+@RequestMapping("/event")
 @RestController
 public class EventRestController {
 
@@ -27,19 +27,20 @@ public class EventRestController {
 	@RequestMapping("/unratedevents")
 	public String unratedEvents(@RequestParam("userid") String userId) {
 		GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
-		List<com.google.api.services.calendar.model.Event> events = new ArrayList<>();
-		if (calendarEvents.isTokenValid()) {
-			events = calendarEvents.getAllEvents();
-		}
-		
+		/*if (!calendarEvents.isTokenValid()) {
+			System.out.println("invalid");
+			return null;
+		}*/
+		List<com.google.api.services.calendar.model.Event> events = calendarEvents.getAllEvents();
 		JSONArray jsonArray = new JSONArray();
 		JSONObject finalData = new JSONObject();
 		for (com.google.api.services.calendar.model.Event e : events) {
-			if (eventRepository.findByeventid(e.getId()) != null) 
+			if (eventRepository.findByeventid(e.getId()) != null) {
 				continue;
+			}
 			JSONObject eventJson = new JSONObject();
 			eventJson.put("eventid", e.getId());
-			if (e.getStart() != null)
+			if (e.getStart() != null && e.getStart().getDate() != null)
 				eventJson.put("date", e.getStart().getDate().getValue());
 			eventJson.put("eventTitle", e.getSummary());
 			eventJson.put("eventDescription", e.getDescription());
@@ -47,7 +48,8 @@ public class EventRestController {
 		}
 		
 		
-		finalData.put("events", "finalData");
+		finalData.put("events", jsonArray);
+		System.out.println(finalData.toString());
 		return finalData.toString();
 	}
 	
