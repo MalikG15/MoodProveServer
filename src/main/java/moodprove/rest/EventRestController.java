@@ -1,7 +1,10 @@
 package moodprove.rest;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,14 +37,30 @@ public class EventRestController {
 		List<com.google.api.services.calendar.model.Event> events = calendarEvents.getAllEvents();
 		JSONArray jsonArray = new JSONArray();
 		JSONObject finalData = new JSONObject();
+		Map<String, com.google.api.services.calendar.model.Event> singularEvents = new HashMap<>();
 		for (com.google.api.services.calendar.model.Event e : events) {
-			if (eventRepository.findByeventid(e.getId()) != null) {
+			if (eventRepository.findByeventid(e.getId()) != null 
+					|| singularEvents.containsKey(e.getId())) {
 				continue;
 			}
+			singularEvents.put(e.getRecurringEventId(), e);
+			/*JSONObject eventJson = new JSONObject();
+			eventJson.put("eventid", e.getId());
+			System.out.println(e.getRecurringEventId());
+			if (e.getStart() != null && e.getStart().getDate() != null) {
+				eventJson.put("date", e.getStart().getDate().getValue());
+			}
+			eventJson.put("eventTitle", e.getSummary());
+			eventJson.put("eventDescription", e.getDescription());
+			jsonArray.put(eventJson);*/
+		}
+		
+		for (Event e : singularEvents.values()) {
 			JSONObject eventJson = new JSONObject();
 			eventJson.put("eventid", e.getId());
-			if (e.getStart() != null && e.getStart().getDate() != null)
+			if (e.getStart() != null && e.getStart().getDate() != null) {
 				eventJson.put("date", e.getStart().getDate().getValue());
+			}
 			eventJson.put("eventTitle", e.getSummary());
 			eventJson.put("eventDescription", e.getDescription());
 			jsonArray.put(eventJson);
@@ -49,7 +68,7 @@ public class EventRestController {
 		
 		
 		finalData.put("events", jsonArray);
-		System.out.println(finalData.toString());
+
 		return finalData.toString();
 	}
 	
@@ -61,6 +80,7 @@ public class EventRestController {
 		e.setUserid(userid);
 		e.setRating(rating);
 		e.setDate(date);
+		System.out.println("RUNNING");
 		eventRepository.saveAndFlush(e);
 	}
 	
