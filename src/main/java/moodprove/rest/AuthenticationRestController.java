@@ -51,6 +51,14 @@ public class AuthenticationRestController {
  		}
 	}
 	
+	@RequestMapping("/checkAuthWithGoogle")
+	public String checkAuthWithGoogle(@RequestParam("userid") String userId) {
+		GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
+		JSONObject authCheckResult = new JSONObject();
+		authCheckResult.put("Result", (calendarEvents.isTokenValid() ? "true" : "false"));
+		return authCheckResult.toString();
+	}
+	
 	
 	
 	
@@ -80,6 +88,4 @@ public class AuthenticationRestController {
 		userRepo.saveAndFlush(u);
 		return "{\"result\": \"success\"}";
 	}
-	
-
 }

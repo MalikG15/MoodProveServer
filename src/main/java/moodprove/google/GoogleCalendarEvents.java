@@ -51,7 +51,7 @@ public class GoogleCalendarEvents {
     
     public boolean isTokenValid() {
     	try {
-    		oauthGoogle.isGoogleTokenValid(userId);
+    		return oauthGoogle.isGoogleTokenValid(userId);
     	}
     	catch (IOException ex) {
     		System.out.println(GoogleCalendarEvents.class.getName());

@@ -30,25 +30,22 @@ public class EventRestController {
 	@RequestMapping("/unratedevents")
 	public String unratedEvents(@RequestParam("userid") String userId) {
 		GoogleCalendarEvents calendarEvents = new GoogleCalendarEvents(userId);
-		/*if (!calendarEvents.isTokenValid()) {
-			System.out.println("invalid");
+		if (!calendarEvents.isTokenValid()) {
 			return null;
-		}*/
+		}
 		List<com.google.api.services.calendar.model.Event> events = calendarEvents.getAllEvents();
 		JSONArray jsonArray = new JSONArray();
 		JSONObject finalData = new JSONObject();
 		Map<String, com.google.api.services.calendar.model.Event> singularEvents = new HashMap<>();
 		for (com.google.api.services.calendar.model.Event e : events) {
 			moodprove.to.Event result = eventRepository.findByeventid(e.getRecurringEventId());
-			//System.out.println(result.getEventid());
-			System.out.println(e.getRecurringEventId() + " " + e.getSummary());
 			if (eventRepository.findByeventid(e.getRecurringEventId()) != null
 					|| singularEvents.containsKey(e.getRecurringEventId())) {
 				continue;
 			}
 			singularEvents.put(e.getRecurringEventId(), e);
 		}
-		System.out.println(singularEvents.size());
+
 		for (Event e : singularEvents.values()) {
 			JSONObject eventJson = new JSONObject();
 			eventJson.put("eventid", e.getRecurringEventId());
