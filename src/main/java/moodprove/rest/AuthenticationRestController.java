@@ -59,7 +59,13 @@ public class AuthenticationRestController {
 		return authCheckResult.toString();
 	}
 	
-	
+	@RequestMapping("/checkAuthWithFacebook")
+	public String checkAuthWithFacebook(@RequestParam("userid") String userId) {
+		User u = userRepo.findByuserid(userId);
+		JSONObject authCheckResult = new JSONObject();
+		authCheckResult.put("Result", ((u.getFacebookAccessToken() != null) ? "true" : "false"));
+		return authCheckResult.toString();
+	}
 	
 	
 	@RequestMapping("/facebook")
