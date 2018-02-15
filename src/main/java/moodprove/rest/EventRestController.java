@@ -39,25 +39,19 @@ public class EventRestController {
 		JSONObject finalData = new JSONObject();
 		Map<String, com.google.api.services.calendar.model.Event> singularEvents = new HashMap<>();
 		for (com.google.api.services.calendar.model.Event e : events) {
-			if (eventRepository.findByeventid(e.getId()) != null 
-					|| singularEvents.containsKey(e.getId())) {
+			moodprove.to.Event result = eventRepository.findByeventid(e.getRecurringEventId());
+			//System.out.println(result.getEventid());
+			System.out.println(e.getRecurringEventId() + " " + e.getSummary());
+			if (eventRepository.findByeventid(e.getRecurringEventId()) != null
+					|| singularEvents.containsKey(e.getRecurringEventId())) {
 				continue;
 			}
 			singularEvents.put(e.getRecurringEventId(), e);
-			/*JSONObject eventJson = new JSONObject();
-			eventJson.put("eventid", e.getId());
-			System.out.println(e.getRecurringEventId());
-			if (e.getStart() != null && e.getStart().getDate() != null) {
-				eventJson.put("date", e.getStart().getDate().getValue());
-			}
-			eventJson.put("eventTitle", e.getSummary());
-			eventJson.put("eventDescription", e.getDescription());
-			jsonArray.put(eventJson);*/
 		}
-		
+		System.out.println(singularEvents.size());
 		for (Event e : singularEvents.values()) {
 			JSONObject eventJson = new JSONObject();
-			eventJson.put("eventid", e.getId());
+			eventJson.put("eventid", e.getRecurringEventId());
 			if (e.getStart() != null && e.getStart().getDate() != null) {
 				eventJson.put("date", e.getStart().getDate().getValue());
 			}
@@ -68,7 +62,6 @@ public class EventRestController {
 		
 		
 		finalData.put("events", jsonArray);
-
 		return finalData.toString();
 	}
 	
@@ -80,7 +73,6 @@ public class EventRestController {
 		e.setUserid(userid);
 		e.setRating(rating);
 		e.setDate(date);
-		System.out.println("RUNNING");
 		eventRepository.saveAndFlush(e);
 	}
 	
