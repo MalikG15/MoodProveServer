@@ -39,7 +39,6 @@ public class WeatherData {
 		w.setSunsetTime(weatherData.getLong("sunsetTime"));
 		w.setPrecipIntensity(weatherData.getDouble("precipIntensity"));
 		w.setPrecipProbability(weatherData.getDouble("precipProbability"));
-		w.setPrecipType(weatherData.getString("precipType"));
 		w.setTemperature((weatherData.getInt("temperatureHigh") + weatherData.getInt("temperatureLow"))/2);
 		w.setHumidity(weatherData.getDouble("humidity"));
 		w.setCloudCover(weatherData.getDouble("cloudCover"));

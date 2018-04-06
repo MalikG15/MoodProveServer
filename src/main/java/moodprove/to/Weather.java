@@ -34,8 +34,6 @@ public class Weather {
 	private Double precipIntensity;
 	@Column(name = "precipprobability")
 	private Double precipProbability;
-	@Column(name = "preciptype")
-	private String precipType;
 	@Column(name = "temperature")
 	private Integer temperature;
 	@Column(name = "humidity")
@@ -86,12 +84,6 @@ public class Weather {
 	}
 	public void setPrecipProbablity(Double precipProbablity) {
 		this.precipProbability = precipProbablity;
-	}
-	public String getPrecipType() {
-		return precipType;
-	}
-	public void setPrecipType(String precipType) {
-		this.precipType = precipType;
 	}
 	public Integer getTemperature() {
 		return temperature;

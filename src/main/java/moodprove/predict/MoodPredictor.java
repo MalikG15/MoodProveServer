@@ -39,8 +39,8 @@ public class MoodPredictor {
 			"@attribute facebookEvents REAL", "@attribute facebookNewsFeed REAL"};
 	
 	private static final String[] WEATHER_HEADERS = new String[] {"@attribute sunriseTime REAL",
-			"@attribute sunsetTime REAL", "@attribute precipIntensity REAL", "@attribute precipProbability REAL",
-			"@attribute precipType STRING", "@attribute temperature REAL", "@attribute humidity REAL",
+			"@attribute sunsetTime REAL", "@attribute precipIntensity REAL", "@attribute precipProbability REAL", 
+			"@attribute temperature REAL", "@attribute humidity REAL",
 			"@attribute cloudCover REAL", "@attribute visibility REAL"};
 	
 	// The base moods are the fundamental moods established within MoodProve
@@ -115,19 +115,19 @@ public class MoodPredictor {
 	
 	public void writePredictiveDataToPastMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PastMood pastMood) {
 		int eventRatings = getTotalEventRatings(events);
-		writerMoodPast.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %d", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
+		writerMoodPast.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
 				sleepData.getNoiseLevel(), socialData.getFacebookLikes(), socialData.getFacebookEvents(), socialData.getFacebookTimeLineUpdates(),
 				weatherData.getSunriseTime(), weatherData.getSunsetTime(), weatherData.getPrecipIntensity(), weatherData.getPrecipProbablity(),
-				weatherData.getPrecipType(), weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
+				weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
 				weatherData.getVisibility(), pastMood.getPrediction()));
 	}
 	
 	public void writePredictiveDataToPredictMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PredictedMood predictedMood) {
 		int eventRatings = getTotalEventRatings(events);
-		writerMoodPredict.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %d, %d, %d, %d, %s", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
+		writerMoodPredict.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
 				sleepData.getNoiseLevel(), socialData.getFacebookLikes(), socialData.getFacebookEvents(), socialData.getFacebookTimeLineUpdates(),
 				weatherData.getSunriseTime(), weatherData.getSunsetTime(), weatherData.getPrecipIntensity(), weatherData.getPrecipProbablity(),
-				weatherData.getPrecipType(), weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
+				weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
 				weatherData.getVisibility(), "?"));
 	}
 	
