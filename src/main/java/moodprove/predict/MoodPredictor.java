@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -152,8 +155,8 @@ public class MoodPredictor {
 		writerMoodPredict.close();
 	}
 	
-	public Map<String, Long> predict() {
-		Map<String, Long> moodProbabilities = new HashMap<>();
+	public JSONArray predict() {
+		JSONArray moodProbabilities = new JSONArray(); 
 		try {
 			// Load training data set
 	        ConverterUtils.DataSource source = new ConverterUtils.DataSource(MOOD_PAST_FILE_LOCATION);
@@ -181,14 +184,17 @@ public class MoodPredictor {
 	        for (int x = 0; x < predictionDataSet.numInstances(); x++) {
 	            Instance newInst = predictionDataSet.instance(x);
 	            int index = 0;
+	            JSONObject prediction = new JSONObject();
 	            for (double d : nb.distributionForInstance(newInst)) {
 	            	long probability = Math.round(d*100);
 	            	if (probability > 0) {
-	            		moodProbabilities.put(moodVariationsList.get(index), probability);
+	            		prediction.put(moodVariationsList.get(index), probability);
+	            		
 	            	} 
 	            	System.out.print(probability + " ");
 	            	index++;
 	            }
+	            moodProbabilities.put(prediction);
 	            System.out.println();
 	        }
 		}

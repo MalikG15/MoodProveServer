@@ -33,8 +33,8 @@ public class PredictedMood {
 	  private String socialId;
 	  @Column(name = "weatherid")
 	  private String weatherId;
-	  @Column(name = "prediction")
-	  private Long prediction;
+	  @Column(name = "prediction", length = 1000)
+	  private String prediction;
 	  
 	public String getPredictedMoodId() {
 		return predictedMoodId;
@@ -78,10 +78,10 @@ public class PredictedMood {
 	public void setSleepid(String sleepid) {
 		this.sleepid = sleepid;
 	}
-	public Long getPrediction() {
+	public String getPrediction() {
 		return prediction;
 	}
-	public void setPrediction(Long prediction) {
+	public void setPrediction(String prediction) {
 		this.prediction = prediction;
 	}
 	

@@ -271,12 +271,12 @@ public class MoodProveCronJob extends TimerTask {
 		}
 		predictor.closeWriters();
 		
-		List<Long> results = predictor.predict();
+		JSONArray results = predictor.predict();
 		// THE MOST IMPORTANT LINE OF CODE IN
 		// THIS ENTIRE PROJECT ^^^^^
 		for (int index = 0; index < predictedMood.size(); index++) {
 			PredictedMood mood = predictedMood.get(index);
-			mood.setPrediction(results.get(index));
+			mood.setPrediction(results.get(index).toString());
 			predictedMoodRepository.saveAndFlush(mood);
 		}
 		
