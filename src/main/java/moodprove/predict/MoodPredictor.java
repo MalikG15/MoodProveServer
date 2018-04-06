@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import weka.classifiers.functions.SMOreg;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
@@ -24,9 +24,9 @@ import moodprove.to.Social;
  */
 public class MoodPredictor {
 	
-	private static final String MOOD_PAST_FILE_LOCATION = "src/main/java/moodprove/predict/mood-past.arff";
+	private static final String MOOD_PAST_FILE_LOCATION = "src/main/java/moodprove/predict/mood-past-test.arff";
 	
-	private static final String MOOD_PREDICT_FILE_LOCATION = "src/main/java/moodprove/predict/mood-predict.arff";
+	private static final String MOOD_PREDICT_FILE_LOCATION = "src/main/java/moodprove/predict/mood-predict-test.arff";
 	
 	private static final String FILE_HEADER = "@relation qdb-weka.filters.unsupervised.attribute.Remove-R1";
 	
@@ -48,14 +48,14 @@ public class MoodPredictor {
 	private PrintWriter writerMoodPredict;
 	
 	public MoodPredictor() {
-		try {
+		/*try {
 			this.writerMoodPast = new PrintWriter(MOOD_PAST_FILE_LOCATION, "UTF-8");
 			this.writerMoodPredict = new PrintWriter(MOOD_PREDICT_FILE_LOCATION, "UTF-8");
 		}
 		catch (IOException ex) {
 			System.out.println(MoodPredictor.class.getName());
 			System.out.println("Error opening PrintWriter");
-		}
+		}*/
 	}
 
 	
@@ -131,10 +131,14 @@ public class MoodPredictor {
 	        ConverterUtils.DataSource source = new ConverterUtils.DataSource(MOOD_PAST_FILE_LOCATION);
 	        Instances trainDataSet = source.getDataSet();
 	        // Set class index to the last index
+	        System.out.println(trainDataSet.numAttributes());
 	        trainDataSet.setClassIndex(trainDataSet.numAttributes() - 1);
 	
 	        // Build model
-	        SMOreg nb = new SMOreg();
+	        NaiveBayes nb = new NaiveBayes();
+	        
+	        //SMOreg nb = new SMOreg();
+	        
 	        nb.buildClassifier(trainDataSet);
 	        System.out.println(nb);
 	
@@ -149,9 +153,15 @@ public class MoodPredictor {
 	            Instance newInst = predictionDataSet.instance(x);
 	            double predNB = nb.classifyInstance(newInst);
 	            predictions.add(Math.round(predNB));
+	            System.out.println(predictionDataSet.classAttribute().value((int) predNB));
+	            for (double d : nb.distributionForInstance(newInst)) {
+	            	System.out.print(Math.round(d*100) + " ");
+	            }
+	            System.out.println();
 	        }
 		}
 		catch (Exception ex) {
+			ex.printStackTrace();
 			System.out.println(MoodPredictor.class.getName());
 			System.out.println("There was an error getting predictions.");
 		}
@@ -161,9 +171,7 @@ public class MoodPredictor {
 	
 	public static void main(String[] args) throws Exception {
 		MoodPredictor moodPredictor = new MoodPredictor();
-		moodPredictor.writeHeadersToMoodPast();
-		moodPredictor.writeHeadersToMoodPredict();
-		moodPredictor.closeWriters();
+		moodPredictor.predict();
 	}
 
 }
