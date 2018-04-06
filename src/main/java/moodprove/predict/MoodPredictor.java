@@ -43,6 +43,12 @@ public class MoodPredictor {
 			"@attribute precipType STRING", "@attribute temperature REAL", "@attribute humidity REAL",
 			"@attribute cloudCover REAL", "@attribute visibility REAL"};
 	
+	// The base moods are the fundamental moods established within MoodProve
+	// while the modifiers make the base moods more complex and personal to the user.
+	private static final String[] BASE_MOODS = new String[] {"happy", "mad", "neutral", "sad", "stressed"};
+	
+	private static final String[] MOOD_MODIFIERS = new String[] {"anxious", "calm", "confused", "overwhelmed", "surprised"};
+	
 	private PrintWriter writerMoodPast;
 	
 	private PrintWriter writerMoodPredict;
@@ -57,6 +63,21 @@ public class MoodPredictor {
 			System.out.println("Error opening PrintWriter");
 		}*/
 	}
+	
+	// Dynamically creates the mood variations
+	public String createMoodVariations() {
+		StringBuilder moodVariations = new StringBuilder();
+		
+		for (String mood : BASE_MOODS) {
+			for (String modifier : MOOD_MODIFIERS) {
+				moodVariations.append(modifier + " " + mood + ", ");
+			}
+			moodVariations.append(mood + ", ");
+		}
+		
+		// removes the extraneous comma and space
+		return moodVariations.substring(0, moodVariations.length() - 2).toString();
+	}
 
 	
 	public void writeHeadersToMoodPast() {
@@ -66,7 +87,10 @@ public class MoodPredictor {
 		printDataType(writerMoodPast, SLEEP_HEADERS);
 		printDataType(writerMoodPast, SOCIAL_HEADERS);
 		printDataType(writerMoodPast, WEATHER_HEADERS);
-		writerMoodPast.println("@attribute mood REAL");
+		
+		
+		
+		writerMoodPast.println("@attribute mood {" + createMoodVariations() + "}");
 		writerMoodPast.println();
 		writerMoodPast.println("@data");
 	}
@@ -78,7 +102,7 @@ public class MoodPredictor {
 		printDataType(writerMoodPredict, SLEEP_HEADERS);
 		printDataType(writerMoodPredict, SOCIAL_HEADERS);
 		printDataType(writerMoodPredict, WEATHER_HEADERS);
-		writerMoodPredict.println("@attribute mood REAL");
+		writerMoodPredict.println("@attribute mood {" + createMoodVariations() + "}");
 		writerMoodPredict.println();
 		writerMoodPredict.println("@data");
 	}
@@ -171,7 +195,8 @@ public class MoodPredictor {
 	
 	public static void main(String[] args) throws Exception {
 		MoodPredictor moodPredictor = new MoodPredictor();
-		moodPredictor.predict();
+		moodPredictor.createMoodVariations();
 	}
+	
 
 }
