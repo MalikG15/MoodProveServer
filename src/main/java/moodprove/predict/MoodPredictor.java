@@ -3,7 +3,9 @@ package moodprove.predict;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instance;
@@ -49,6 +51,8 @@ public class MoodPredictor {
 	
 	private static final String[] MOOD_MODIFIERS = new String[] {"anxious", "calm", "confused", "overwhelmed", "surprised"};
 	
+	private List<String> moodVariationsList;
+	
 	private PrintWriter writerMoodPast;
 	
 	private PrintWriter writerMoodPredict;
@@ -67,12 +71,15 @@ public class MoodPredictor {
 	// Dynamically creates the mood variations
 	public String createMoodVariations() {
 		StringBuilder moodVariations = new StringBuilder();
+		moodVariationsList = new ArrayList<>();
 		
 		for (String mood : BASE_MOODS) {
 			for (String modifier : MOOD_MODIFIERS) {
 				moodVariations.append(modifier + " " + mood + ", ");
+				moodVariationsList.add(modifier + " " + mood);
 			}
 			moodVariations.append(mood + ", ");
+			moodVariationsList.add(mood);
 		}
 		
 		// removes the extraneous comma and space
@@ -87,9 +94,6 @@ public class MoodPredictor {
 		printDataType(writerMoodPast, SLEEP_HEADERS);
 		printDataType(writerMoodPast, SOCIAL_HEADERS);
 		printDataType(writerMoodPast, WEATHER_HEADERS);
-		
-		
-		
 		writerMoodPast.println("@attribute mood {" + createMoodVariations() + "}");
 		writerMoodPast.println();
 		writerMoodPast.println("@data");
@@ -148,8 +152,8 @@ public class MoodPredictor {
 		writerMoodPredict.close();
 	}
 	
-	public List<Long> predict() {
-		List<Long> predictions = new ArrayList<>();
+	public Map<String, Long> predict() {
+		Map<String, Long> moodProbabilities = new HashMap<>();
 		try {
 			// Load training data set
 	        ConverterUtils.DataSource source = new ConverterUtils.DataSource(MOOD_PAST_FILE_LOCATION);
@@ -161,8 +165,6 @@ public class MoodPredictor {
 	        // Build model
 	        NaiveBayes nb = new NaiveBayes();
 	        
-	        //SMOreg nb = new SMOreg();
-	        
 	        nb.buildClassifier(trainDataSet);
 	        System.out.println(nb);
 	
@@ -173,13 +175,19 @@ public class MoodPredictor {
 	
 	        predictionDataSet.setClassIndex(predictionDataSet.numAttributes() - 1);
 	        
+	        // Iterating through predictive instances,
+	        // and calculating the probability the user
+	        // will feel a particular mood based on history
 	        for (int x = 0; x < predictionDataSet.numInstances(); x++) {
 	            Instance newInst = predictionDataSet.instance(x);
-	            double predNB = nb.classifyInstance(newInst);
-	            predictions.add(Math.round(predNB));
-	            System.out.println(predictionDataSet.classAttribute().value((int) predNB));
+	            int index = 0;
 	            for (double d : nb.distributionForInstance(newInst)) {
-	            	System.out.print(Math.round(d*100) + " ");
+	            	long probability = Math.round(d*100);
+	            	if (probability > 0) {
+	            		moodProbabilities.put(moodVariationsList.get(index), probability);
+	            	} 
+	            	System.out.print(probability + " ");
+	            	index++;
 	            }
 	            System.out.println();
 	        }
@@ -190,7 +198,7 @@ public class MoodPredictor {
 			System.out.println("There was an error getting predictions.");
 		}
 		
-		return predictions;
+		return moodProbabilities;
 	}
 	
 	public static void main(String[] args) throws Exception {
