@@ -2,9 +2,12 @@ package moodprove.rest;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -67,23 +70,6 @@ public class AuthenticationRestController {
 		return authCheckResult.toString();
 	}
 	
-	
-	@RequestMapping("/facebook")
-	public String getFacebookToken(@RequestParam("code") String code) {
-		JSONObject t = new JSONObject();
-		try {
-			t = OAuthFacebook.getFacebookUserToken(code);
-		}
-		catch (IOException ex) {
-			System.out.println(AuthenticationRestController.class.getName());
-			System.out.println("Retrieving the access token failed.");
-			t.put("Error", "Retrieving the Facebook access token failed");
-			return t.toString();
-		}
-		
-		return String.format(OAuthFacebook.getOauthSuccessReponseHtml(), t.getString("access_token"));
-	}
-	
 	@RequestMapping("/facebook/saveToken")
 	public String saveFacebookToken(@RequestParam("userid") String userId, @RequestParam("token") String token) {
 		User u = userRepo.findByuserid(userId);
@@ -93,5 +79,15 @@ public class AuthenticationRestController {
 		u.setFacebookTokenExpire(fbExpirationTime);
 		userRepo.saveAndFlush(u);
 		return "{\"result\": \"success\"}";
+	}
+	
+	@RequestMapping(value = "/redirect", method = RequestMethod.GET)
+	public void redirect(HttpServletResponse http, @RequestParam("code") String code) {
+		try {
+			http.sendRedirect("Lawrence.MoodProveMacApp://?code=" + code);
+		}
+		catch (Exception ex) {
+			
+		}
 	}
 }

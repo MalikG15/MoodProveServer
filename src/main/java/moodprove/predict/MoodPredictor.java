@@ -52,7 +52,7 @@ public class MoodPredictor {
 	// while the modifiers make the base moods more complex and personal to the user.
 	private static final String[] BASE_MOODS = new String[] {"happy", "mad", "neutral", "sad", "stressed"};
 	
-	private static final String[] MOOD_MODIFIERS = new String[] {"anxious", "calm", "confused", "overwhelmed", "surprised"};
+	private static final String[] MOOD_MODIFIERS = new String[] {"anxious", "calm", "confused", "overwhelmingly"};
 	
 	private List<String> moodVariationsList;
 	
@@ -189,7 +189,6 @@ public class MoodPredictor {
 	            	long probability = Math.round(d*100);
 	            	if (probability > 0) {
 	            		prediction.put(moodVariationsList.get(index), probability);
-	            		
 	            	} 
 	            	System.out.print(probability + " ");
 	            	index++;
@@ -210,6 +209,7 @@ public class MoodPredictor {
 	public static void main(String[] args) throws Exception {
 		MoodPredictor moodPredictor = new MoodPredictor();
 		moodPredictor.createMoodVariations();
+		moodPredictor.predict();
 	}
 	
 
