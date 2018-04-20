@@ -11,11 +11,17 @@
 @attribute sunsetTime REAL
 @attribute precipIntensity REAL
 @attribute precipProbability REAL
-@attribute precipType STRING
 @attribute temperature REAL
 @attribute humidity REAL
 @attribute cloudCover REAL
 @attribute visibility REAL
-@attribute mood REAL
+@attribute mood {"anxious happy", "calm happy", "confused happy", "overwhelmingly happy", "happy", "anxious mad", "calm mad", "confused mad", "overwhelmingly mad", "mad", "anxious neutral", "calm neutral", "confused neutral", "overwhelmingly neutral", "neutral", "anxious sad", "calm sad", "confused sad", "overwhelmingly sad", "sad", "anxious stressed", "calm stressed", "confused stressed", "overwhelmingly stressed", "stressed"}
 
 @data
+0, 1, 1, 1, 1, 1, 1, 1, 1, 1.000000, 1.000000, 1, 1.000000, 1.000000, 1, "anxious happy"
+0, 2, 2, 2, 2, 2, 2, 2, 2, 2.000000, 2.000000, 2, 2.000000, 2.000000, 2, "calm sad"
+0, 3, 3, 3, 3, 3, 3, 3, 3, 3.000000, 3.000000, 3, 3.000000, 3.000000, 3, "stressed"
+0, 4, 4, 4, 4, 4, 4, 4, 4, 4.000000, 4.000000, 4, 4.000000, 4.000000, 4, "overwhelmingly happy"
+0, 5, 5, 5, 5, 5, 5, 5, 5, 5.000000, 5.000000, 5, 5.000000, 5.000000, 5, "confused neutral"
+0, 6, 6, 6, 6, 6, 6, 6, 6, 6.000000, 6.000000, 6, 6.000000, 6.000000, 6, "neutral"
+0, 7, 7, 7, 7, 7, 7, 7, 7, 7.000000, 7.000000, 7, 7.000000, 7.000000, 7, "sad"

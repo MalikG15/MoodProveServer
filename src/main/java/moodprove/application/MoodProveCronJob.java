@@ -43,7 +43,7 @@ public class MoodProveCronJob extends TimerTask {
 	@Autowired
 	private WeatherRepository weatherRepository;
 	
-	private static final String[] DAYS_OF_WEEK = new String[] {"Sun", "Mon", "Tu", "Wed", "Thu", "Fri", "Sat"};
+	private static final String[] DAYS_OF_WEEK = new String[] {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 	@Override
 	public void run() {
@@ -184,7 +184,10 @@ public class MoodProveCronJob extends TimerTask {
 				eventIds.append(e.getId() + ",");
 			}
 		}
-		return eventIds.toString();
+		if (eventIds.length() == 0) {
+			return null;
+		}
+		return eventIds.substring(0, eventIds.length() - 1).toString();
 	}
 	
 	public String setWeatherDataForDay(WeatherData weatherData, JSONObject data, String userId, Long date) {
@@ -224,19 +227,24 @@ public class MoodProveCronJob extends TimerTask {
 		newSleep.setDay(day);
 		List<Sleep> sleepDataForDay = sleepRepository.findByday(day);
 		
-		int totalSleepLength = 0, totalSleepCycles = 0, totalSleepNoiseLevel = 0;
-		for (Sleep s : sleepDataForDay) {
-			totalSleepLength += s.getSleeplength();
-			totalSleepCycles += s.getSleepCyles();
-			totalSleepNoiseLevel += s.getNoiseLevel();
+		if (sleepDataForDay.size() > 0) {
+			int totalSleepLength = 0, totalSleepCycles = 0, totalSleepNoiseLevel = 0;
+			for (Sleep s : sleepDataForDay) {
+				totalSleepLength += s.getSleeplength();
+				totalSleepCycles += s.getSleepCyles();
+				totalSleepNoiseLevel += s.getNoiseLevel();
+			}
+			
+			newSleep.setSleeplength(totalSleepLength / sleepDataForDay.size());
+			newSleep.setSleepCyles(totalSleepCycles / sleepDataForDay.size());
+			newSleep.setNoiseLevel(totalSleepNoiseLevel / sleepDataForDay.size());
+			
+			newSleep = sleepRepository.saveAndFlush(newSleep);
+			return newSleep.getSleepId();
 		}
 		
-		newSleep.setSleeplength(totalSleepLength / sleepDataForDay.size());
-		newSleep.setSleepCyles(totalSleepCycles / sleepDataForDay.size());
-		newSleep.setNoiseLevel(totalSleepNoiseLevel / sleepDataForDay.size());
-		
-		newSleep = sleepRepository.saveAndFlush(newSleep);
-		return newSleep.getSleepId();
+		// Test how the code handles searching for a null value in makeprediction method
+		return null;
 	}
 	
 	public void makePredictionForNext7Days(User user) {
@@ -248,8 +256,10 @@ public class MoodProveCronJob extends TimerTask {
 		predictor.writeHeadersToMoodPredict();
 		for (PastMood mood : pastMood) {
 			List<Event> events = new ArrayList<>();
-			for (String s : mood.getEvents().split(",")) {
-				events.add(eventRepository.findByeventid(s));
+			if (mood.getEvents() != null) {
+				for (String s : mood.getEvents().split(",")) {
+					events.add(eventRepository.findByeventid(s));
+				}
 			}
 			predictor.writePredictiveDataToPastMood(events, 
 					sleepRepository.findBysleepid(mood.getSleepid()), 
@@ -260,8 +270,10 @@ public class MoodProveCronJob extends TimerTask {
 		
 		for (PredictedMood mood : predictedMood) {
 			List<Event> events = new ArrayList<>();
-			for (String s : mood.getEvents().split(",")) {
-				events.add(eventRepository.findByeventid(s));
+			if (mood.getEvents() != null) {
+				for (String s : mood.getEvents().split(",")) {
+					events.add(eventRepository.findByeventid(s));
+				}
 			}
 			predictor.writePredictiveDataToPredictMood(events, 
 					sleepRepository.findBysleepid(mood.getSleepid()), 

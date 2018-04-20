@@ -22,6 +22,16 @@ public class PastMoodRestController {
 	@Autowired
 	PastMoodRepository pastMoodRepository;
 	
+	// Test Purposes Only
+	// 1523815790000
+	// 1523902190000
+	// 1523988590000
+	// 1524074990000
+	// 1524161390000
+	// 1524247790000
+	// 1524334190000
+	
+	
 	
 	@RequestMapping("/beforeOrAfter")
 	public String getMoodBeforeOrAfter(@RequestParam("userid") String userId, @RequestParam("timestamp") Long timestamp,
@@ -62,6 +72,10 @@ public class PastMoodRestController {
 		List<PastMood> pastMood = pastMoodRepository.findAllByuserid(userId);
 
 		return String.format("{\"data:\" \"%s\"}", (pastMood == null || pastMood.size() < 7) ? "Insufficient" : "Sufficient");
+	}
+	
+	public static void main(String[] args) {
+		
 	}
 
 }

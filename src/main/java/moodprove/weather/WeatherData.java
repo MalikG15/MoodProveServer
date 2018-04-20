@@ -28,6 +28,7 @@ public class WeatherData {
 	
 	public JSONObject getTodaysWeatherData() {
 		JSONArray weatherDailyArray = getDailyWeatherData();
+		System.out.println(weatherDailyArray.toString());
 		return weatherDailyArray.getJSONObject(0);
 	}
 	
@@ -35,20 +36,24 @@ public class WeatherData {
 		Weather w = new Weather();
 		w.setUserId(userId);
 		w.setDate(date);
-		w.setSunriseTime(weatherData.getLong("sunriseTime"));
-		w.setSunsetTime(weatherData.getLong("sunsetTime"));
-		w.setPrecipIntensity(weatherData.getDouble("precipIntensity"));
-		w.setPrecipProbability(weatherData.getDouble("precipProbability"));
-		w.setTemperature((weatherData.getInt("temperatureHigh") + weatherData.getInt("temperatureLow"))/2);
-		w.setHumidity(weatherData.getDouble("humidity"));
-		w.setCloudCover(weatherData.getDouble("cloudCover"));
-		w.setVisibility(weatherData.getInt("visibility"));
+		if (weatherData.has("sunriseTime")) w.setSunriseTime(weatherData.getLong("sunriseTime"));
+		if (weatherData.has("sunsetTime")) w.setSunsetTime(weatherData.getLong("sunsetTime"));
+		if (weatherData.has("precipIntensity")) w.setPrecipIntensity(weatherData.getDouble("precipIntensity"));
+		if (weatherData.has("precipProbability")) w.setPrecipProbability(weatherData.getDouble("precipProbability"));
+		if (weatherData.has("temperatureHigh") && weatherData.has("temperatureLow")) {
+			w.setTemperature((weatherData.getInt("temperatureHigh") + weatherData.getInt("temperatureLow"))/2);
+		}
+		if (weatherData.has("humidity")) w.setHumidity(weatherData.getDouble("humidity"));
+		if (weatherData.has("cloudCover")) w.setCloudCover(weatherData.getDouble("cloudCover"));
+		if (weatherData.has("visibility")) w.setVisibility(weatherData.getInt("visibility"));
 		return w;
 	}
 	
 	public static void main(String[] args) {
-		WeatherData data = new WeatherData(42.3601, -71.0589);
-		System.out.print(data.getTodaysWeatherData().toString());
+		WeatherData data = new WeatherData(44.259839252451, -88.3965381816552);
+		//System.out.print(data.getTodaysWeatherData().toString());
+		Long l = (long) 12122;
+		data.convertJSONObjectToWeather(data.getTodaysWeatherData(), "1", l);
 	}
 
 }

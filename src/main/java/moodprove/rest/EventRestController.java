@@ -69,7 +69,6 @@ public class EventRestController {
 		
 		
 		finalData.put("events", jsonArray);
-		System.out.println(finalData.toString());
 		return finalData.toString();
 	}
 	

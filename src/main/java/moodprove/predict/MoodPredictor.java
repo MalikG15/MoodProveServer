@@ -29,9 +29,9 @@ import moodprove.to.Social;
  */
 public class MoodPredictor {
 	
-	private static final String MOOD_PAST_FILE_LOCATION = "src/main/java/moodprove/predict/mood-past-test.arff";
+	private static final String MOOD_PAST_FILE_LOCATION = "src/main/java/moodprove/predict/mood-past.arff";
 	
-	private static final String MOOD_PREDICT_FILE_LOCATION = "src/main/java/moodprove/predict/mood-predict-test.arff";
+	private static final String MOOD_PREDICT_FILE_LOCATION = "src/main/java/moodprove/predict/mood-predict.arff";
 	
 	private static final String FILE_HEADER = "@relation qdb-weka.filters.unsupervised.attribute.Remove-R1";
 	
@@ -61,14 +61,14 @@ public class MoodPredictor {
 	private PrintWriter writerMoodPredict;
 	
 	public MoodPredictor() {
-		/*try {
+		try {
 			this.writerMoodPast = new PrintWriter(MOOD_PAST_FILE_LOCATION, "UTF-8");
 			this.writerMoodPredict = new PrintWriter(MOOD_PREDICT_FILE_LOCATION, "UTF-8");
 		}
 		catch (IOException ex) {
 			System.out.println(MoodPredictor.class.getName());
 			System.out.println("Error opening PrintWriter");
-		}*/
+		}
 	}
 	
 	// Dynamically creates the mood variations
@@ -78,11 +78,11 @@ public class MoodPredictor {
 		
 		for (String mood : BASE_MOODS) {
 			for (String modifier : MOOD_MODIFIERS) {
-				moodVariations.append(modifier + " " + mood + ", ");
-				moodVariationsList.add(modifier + " " + mood);
+				moodVariations.append("\"" + modifier + " " + mood + "\", ");
+				moodVariationsList.add("\"" + modifier + " " + mood + "\"");
 			}
-			moodVariations.append(mood + ", ");
-			moodVariationsList.add(mood);
+			moodVariations.append("\"" + mood + "\", ");
+			moodVariationsList.add("\"" + mood + "\"");
 		}
 		
 		// removes the extraneous comma and space
@@ -122,20 +122,20 @@ public class MoodPredictor {
 	
 	public void writePredictiveDataToPastMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PastMood pastMood) {
 		int eventRatings = getTotalEventRatings(events);
-		writerMoodPast.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
+		writerMoodPast.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %d, %f, %f, %d, %s", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
 				sleepData.getNoiseLevel(), socialData.getFacebookLikes(), socialData.getFacebookEvents(), socialData.getFacebookTimeLineUpdates(),
 				weatherData.getSunriseTime(), weatherData.getSunsetTime(), weatherData.getPrecipIntensity(), weatherData.getPrecipProbablity(),
 				weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
-				weatherData.getVisibility(), pastMood.getPrediction()));
+				(weatherData.getVisibility() != null) ? weatherData.getVisibility() : 0, pastMood.getPrediction()));
 	}
 	
 	public void writePredictiveDataToPredictMood(List<Event> events, Sleep sleepData, Social socialData, Weather weatherData, PredictedMood predictedMood) {
 		int eventRatings = getTotalEventRatings(events);
-		writerMoodPredict.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
+		writerMoodPredict.println(String.format("%d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %d, %f, %f, %d, %s", eventRatings, sleepData.getSleeplength(), sleepData.getSleepCyles(),
 				sleepData.getNoiseLevel(), socialData.getFacebookLikes(), socialData.getFacebookEvents(), socialData.getFacebookTimeLineUpdates(),
 				weatherData.getSunriseTime(), weatherData.getSunsetTime(), weatherData.getPrecipIntensity(), weatherData.getPrecipProbablity(),
 				weatherData.getTemperature(), weatherData.getHumidity(), weatherData.getCloudCover(), 
-				weatherData.getVisibility(), "?"));
+				(weatherData.getVisibility() != null) ? weatherData.getVisibility() : (long) 0, "?"));
 	}
 	
 	
@@ -209,7 +209,10 @@ public class MoodPredictor {
 	public static void main(String[] args) throws Exception {
 		MoodPredictor moodPredictor = new MoodPredictor();
 		moodPredictor.createMoodVariations();
-		moodPredictor.predict();
+		JSONArray cap = moodPredictor.predict();
+		for (int x = 0; x < cap.length(); x++) {
+			System.out.println(cap.get(x).toString());
+		}
 	}
 	
 
