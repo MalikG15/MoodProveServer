@@ -41,12 +41,13 @@ public class SleepData {
 	
 	 public boolean isTokenValid() {
 		try {
-			oauthGoogle.isGoogleTokenValid(userId);
+			return oauthGoogle.isGoogleTokenValid(userId);
 		}
 		catch (IOException ex) {
 			System.out.println(SleepData.class.getName());
 			System.out.println("Could not check if token is valid.");
 		}
+		
 		return false;
 	 }
 	
@@ -64,6 +65,7 @@ public class SleepData {
 				sleepNoiseLevel += current.getInt("noiseLevel");
 				sleepCycles += current.getInt("cycles");
 			}
+			
 			// Set average noise level
 			sleepRecord.setNoiseLevel(sleepNoiseLevel / sleepData.length());
 			// Set average sleep cycles
@@ -75,13 +77,27 @@ public class SleepData {
 		}
 		catch (IOException ex) {
 			System.out.println(SleepData.class.getName());
- 			System.out.println("Could not load Google OAuth credentials");
+ 			System.out.println("Could not load Google OAuth credentials to retrieve sleep data.");
 		}
 		return null;
 	}
 	
+	public boolean isSleepDataAvailable(Long afterTimestamp) {
+		try {
+			Credential credential = oauthGoogle.authorize(userId);
+			JSONObject sleepCloudData = new JSONObject(MoodProveHttp.executeGet(SLEEP_CLOUD_API_CALL + afterTimestamp, credential.getAccessToken()));
+			JSONArray sleepData = sleepCloudData.getJSONArray("sleeps");
+			return sleepData.length() != 0;
+		}
+		catch (IOException ex) {
+			System.out.println(SleepData.class.getName());
+ 			System.out.println("Could not load Google OAuth credentials to check sleep data availability.");
+		}
+		return false;
+	}
+	
 	public static void main(String[] args) {
-		SleepData data = new SleepData("bc0e577c-b434-4129-8ded-d4882967fa24");
+		SleepData data = new SleepData("76508320-fe58-4c71-88a3-f90c2087c117");
 		System.out.println(data.getSleepData(Long.valueOf(1514846489)).toString());
 	}
 

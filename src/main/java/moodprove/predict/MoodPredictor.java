@@ -183,17 +183,20 @@ public class MoodPredictor {
 	        // will feel a particular mood based on history
 	        for (int x = 0; x < predictionDataSet.numInstances(); x++) {
 	            Instance newInst = predictionDataSet.instance(x);
-	            int index = 0;
-	            JSONObject prediction = new JSONObject();
+	            int index = 0;  
+	            JSONArray predictions = new JSONArray();
 	            for (double d : nb.distributionForInstance(newInst)) {
 	            	long probability = Math.round(d*100);
 	            	if (probability > 0) {
-	            		prediction.put(moodVariationsList.get(index), probability);
+	            		JSONObject prediction = new JSONObject();
+	            		prediction.put("mood", moodVariationsList.get(index));
+	            		prediction.put("probability", probability);
+	            		predictions.put(prediction);
 	            	} 
 	            	System.out.print(probability + " ");
 	            	index++;
 	            }
-	            moodProbabilities.put(prediction);
+	            moodProbabilities.put(predictions);
 	            System.out.println();
 	        }
 		}

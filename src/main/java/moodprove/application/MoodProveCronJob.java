@@ -90,7 +90,20 @@ public class MoodProveCronJob extends TimerTask {
 		newPastMood.setUserid(oldestPredicted.getUserid());
 		newPastMood.setDate(oldestPredicted.getDate());
 		newPastMood.setEvents(oldestPredicted.getEvents());
-		newPastMood.setPrediction(oldestPredicted.getPrediction());
+		
+		// The prediction data is now being saved as a JSON string,
+		// so it must be retrieved as such
+		int highestPrevProbability = 0;
+		String mood = "";
+		JSONArray predictions = new JSONArray(oldestPredicted.getPrediction());
+		for (int index = 0; index < predictions.length(); index++) {
+			JSONObject prediction = predictions.getJSONObject(index);
+			if (prediction.getInt("probability") > highestPrevProbability) {
+				highestPrevProbability = prediction.getInt("probability");
+				mood = prediction.getString("mood");
+			}
+		}
+		newPastMood.setPrediction(mood);
 		
 		
 		// Check token validity before retrieving data
@@ -108,8 +121,12 @@ public class MoodProveCronJob extends TimerTask {
 		}
 
 		// If data is null, then we do not change from averages
-		if (sleepRecord != null) newPastMood.setSleepid(sleepRecord.getSleepId());
-		else newPastMood.setSocialId(oldestPredicted.getSleepid());
+		if (sleepRecord != null) {
+			newPastMood.setSleepid(sleepRecord.getSleepId());
+		}
+		else {
+			newPastMood.setSleepid(oldestPredicted.getSleepid());
+		}
 		
 		// If data is null, then we do not change from averages
 		if (socialRecord != null) newPastMood.setSocialId(socialRecord.getSocialid());
@@ -121,16 +138,20 @@ public class MoodProveCronJob extends TimerTask {
 	
 	public Sleep changeRecentSleepData(String userId, PredictedMood oldestPredicted, Long twentyFourHoursBefore, SleepData data) {
 		// Retrieving most recent sleepRecord
-		Sleep sleepRecord = data.getSleepData(twentyFourHoursBefore);
-		sleepRecord.setUserid(userId);
-		sleepRecord.setDay(convertTimeMillisToDay(twentyFourHoursBefore));
-		sleepRecord.setDate(twentyFourHoursBefore);
-		sleepRecord = sleepRepository.saveAndFlush(sleepRecord);
-				
-		// Delete the predicted sleep because it is just averages
-		sleepRepository.deleteBysleepid(oldestPredicted.getSleepid());
-		
-		return sleepRecord;
+		if (data.isSleepDataAvailable(twentyFourHoursBefore)) {
+			Sleep sleepRecord = data.getSleepData(twentyFourHoursBefore);
+			sleepRecord.setUserid(userId);
+			sleepRecord.setDay(convertTimeMillisToDay(twentyFourHoursBefore));
+			sleepRecord.setDate(twentyFourHoursBefore);
+			sleepRecord = sleepRepository.saveAndFlush(sleepRecord);
+					
+			// Delete the predicted sleep because it is just averages
+			sleepRepository.deleteBysleepid(oldestPredicted.getSleepid());
+			
+			return sleepRecord;
+		}
+	
+		return null;
 	}	
 	
 	public Social changeRecentSocialData(String userId, PredictedMood oldestPredicted, Long twentyFourHoursBefore, String fbToken) {

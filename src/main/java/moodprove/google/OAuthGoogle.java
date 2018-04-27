@@ -138,7 +138,6 @@ public class OAuthGoogle {
 	                .setAccessType("offline")
 	                .build();
 	 		Credential credential = flow.loadCredential(userId);
-	 	    System.out.println(credential.getAccessToken() + " is the access token.");
 	 		return credential.refreshToken();
  		}
  		catch (FileNotFoundException ex) {
