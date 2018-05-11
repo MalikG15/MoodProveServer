@@ -32,7 +32,7 @@ public class PastMood {
 	private String socialId;
 	@Column(name = "weatherid")
 	private String weatherId;
-	@Column(name = "prediction", length = 1000)
+	@Column(name = "prediction", length = 2000)
 	private String prediction;
 
 	public String getPastMoodId() {

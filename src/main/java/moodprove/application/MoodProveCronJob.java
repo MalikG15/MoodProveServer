@@ -129,8 +129,12 @@ public class MoodProveCronJob extends TimerTask {
 		}
 		
 		// If data is null, then we do not change from averages
-		if (socialRecord != null) newPastMood.setSocialId(socialRecord.getSocialid());
-		else newPastMood.setSocialId(oldestPredicted.getSocialId());
+		if (socialRecord != null) {
+			newPastMood.setSocialId(socialRecord.getSocialid());
+		}
+		else {
+			newPastMood.setSocialId(oldestPredicted.getSocialId());
+		}
 		
 		newPastMood.setWeatherId(oldestPredicted.getWeatherId());
 		pastMoodRepository.saveAndFlush(newPastMood);
@@ -146,7 +150,9 @@ public class MoodProveCronJob extends TimerTask {
 			sleepRecord = sleepRepository.saveAndFlush(sleepRecord);
 					
 			// Delete the predicted sleep because it is just averages
-			sleepRepository.deleteBysleepid(oldestPredicted.getSleepid());
+			if (oldestPredicted != null) {
+				sleepRepository.deleteBysleepid(oldestPredicted.getSleepid());
+			}
 			
 			return sleepRecord;
 		}
@@ -168,7 +174,9 @@ public class MoodProveCronJob extends TimerTask {
 		socialRecord = socialRepository.saveAndFlush(socialRecord);
 		
 		// Delete the predicted social because it is just averages
-		socialRepository.deleteBysocialid(oldestPredicted.getSocialId());
+		if (oldestPredicted != null) {
+			socialRepository.deleteBysocialid(oldestPredicted.getSocialId());
+		}
 		
 		return socialRecord;
 	}
@@ -177,7 +185,7 @@ public class MoodProveCronJob extends TimerTask {
 		String userId = user.getUserid();
 		Long twentyFourHoursInMilliseconds = Long.valueOf(86400*1000);
 		WeatherData weatherData = new WeatherData(user.getLongitude(), user.getLatitude());
-		JSONArray array = weatherData.getDailyWeatherData();
+		JSONArray array = weatherData.getDailyWeatherData(false, null);
 		for (int day = 0; day < 7; day++) {
 			PredictedMood newMood = new PredictedMood();
 			newMood.setUserid(userId);

@@ -167,9 +167,7 @@ public class MoodPredictor {
 	
 	        // Build model
 	        NaiveBayes nb = new NaiveBayes();
-	        
 	        nb.buildClassifier(trainDataSet);
-	        System.out.println(nb);
 	
 	        // Load test data set
 	        ConverterUtils.DataSource predictionSource = new ConverterUtils.DataSource(MOOD_PREDICT_FILE_LOCATION);

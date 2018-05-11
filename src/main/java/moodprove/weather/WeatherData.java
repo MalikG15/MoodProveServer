@@ -8,7 +8,9 @@ import moodprove.to.Weather;
 
 public class WeatherData {
 	
-	private static final String WEATHER_API_CALL = "https://api.darksky.net/forecast/%s/%s,%s";
+	private static final String STANDARD_WEATHER_API_CALL = "https://api.darksky.net/forecast/%s/%s,%s";
+	
+	private static final String TIME_DEPENDENT_WEATHER_API_CALL = "https://api.darksky.net/forecast/%s/%s,%f";
 	
 	private final Double longitude;
 	
@@ -19,15 +21,27 @@ public class WeatherData {
 		this.latitude = latitude;
 	}
 
-	public JSONArray getDailyWeatherData() {
-		String weatherResponse = MoodProveHttp.executeGet(String.format(WEATHER_API_CALL, WeatherAPIClientInfo.WEATHER_API_KEY, latitude, longitude), "");
+	public JSONArray getDailyWeatherData(boolean timeDependent, Long time) {
+		String weatherResponse = "";
+		if (!timeDependent) {
+			weatherResponse = MoodProveHttp.executeGet(String.format(STANDARD_WEATHER_API_CALL, WeatherAPIClientInfo.WEATHER_API_KEY, latitude, longitude), "");
+		}
+		else {
+			weatherResponse = MoodProveHttp.executeGet(String.format(TIME_DEPENDENT_WEATHER_API_CALL, WeatherAPIClientInfo.WEATHER_API_KEY, latitude, longitude, time), "");;
+		}
 		JSONObject weatherData = new JSONObject(weatherResponse);
 		JSONArray daily = weatherData.getJSONObject("daily").getJSONArray("data");
 		return daily;
 	}
 	
 	public JSONObject getTodaysWeatherData() {
-		JSONArray weatherDailyArray = getDailyWeatherData();
+		JSONArray weatherDailyArray = getDailyWeatherData(false, null);
+		System.out.println(weatherDailyArray.toString());
+		return weatherDailyArray.getJSONObject(0);
+	}
+	
+	public JSONObject getTodaysWeatherDataTimeDependent(Long time) {
+		JSONArray weatherDailyArray = getDailyWeatherData(false, time);
 		System.out.println(weatherDailyArray.toString());
 		return weatherDailyArray.getJSONObject(0);
 	}
@@ -50,10 +64,10 @@ public class WeatherData {
 	}
 	
 	public static void main(String[] args) {
-		WeatherData data = new WeatherData(44.259839252451, -88.3965381816552);
+		WeatherData data = new WeatherData(44.2600610, -88.3964900);
 		//System.out.print(data.getTodaysWeatherData().toString());
-		Long l = (long) 12122;
-		data.convertJSONObjectToWeather(data.getTodaysWeatherData(), "1", l);
+		Long l = (long) 1525752799;
+		System.out.println(data.getDailyWeatherData(true, l));
 	}
 
 }
