@@ -51,6 +51,8 @@ public class PredictedMoodRestController {
 		Date dateCheckInHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
 		JSONObject response = new JSONObject();
 		Date dateCheckIn =  new Date(u.getNewUserNextCheckInTime());
+		// Adding a day for development purposes only
+		// normally, users would not be able to check-in the day of
 		Date dateUserCurrent = new Date((timestamp*1000) + 86400000);
 		if (timestamp >= dateCheckInHourAfter.getTime()) {
 			u.setNewUserNextCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
@@ -70,24 +72,24 @@ public class PredictedMoodRestController {
 	}
 	
 	@RequestMapping("/checkIn")
-	public String checkIn(@RequestParam("userid") String userId, @RequestParam("timestamp") Long timestamp,
+	public String checkIn(@RequestParam("userid") String userId, @RequestParam("timestamp") String timestampVal,
 			@RequestParam("mood") String mood) {
 		User u = userRepo.findByuserid(userId);
-		if (u == null) return null;
+		Long timestamp = Long.valueOf(timestampVal);
+		
+		if (u == null) {
+			return null;
+		}
+		
 		Long anHourInMilliseconds = Long.valueOf(3600000);
 		Date dateCheckInHourAfter =  new Date(u.getNewUserNextCheckInTime() + anHourInMilliseconds);
-		if (timestamp >= dateCheckInHourAfter.getTime()) {
-			u.setNewUserNextCheckInTime(UserRestController.getNextDayCheckIn(u.getScheduledTimeOfPrediction()));
-			u = userRepo.saveAndFlush(u);
-		}
 		Date dateCheckIn =  new Date(u.getNewUserNextCheckInTime());
-		Date dateUserCurrent = new Date(timestamp);
+		Date dateUserCurrent = new Date((timestamp*1000) + 86400000);
 		
 		if (dateUserCurrent.after(dateCheckIn) && dateUserCurrent.before(dateCheckInHourAfter)) {
 			// Used to a day for another checkin or to subtract a day for weather info
 			Long aDayInMilliseconds = Long.valueOf(86400000);
 			Long dayBefore = timestamp - aDayInMilliseconds;
-			
 			
 			// Retrieve data and set new past mood
 			PastMood newPastMood = new PastMood();
@@ -98,17 +100,19 @@ public class PredictedMoodRestController {
 			User user = userRepo.findByuserid(userId);
 			
 			// Get weather
-			Double latitude = user.getLatitude();
-			Double longitude = user.getLongitude();
-			
-			WeatherData weatherData = new WeatherData(longitude, latitude);
-			Weather weather = weatherData.convertJSONObjectToWeather(weatherData.getTodaysWeatherDataTimeDependent(dayBefore), userId, dayBefore);
-			weather = weatherRepo.saveAndFlush(weather);
-			newPastMood.setWeatherId(weather.getWeatherId());
+			if (user.getLatitude() != null && user.getLongitude() != null) {
+				Double latitude = user.getLatitude();
+				Double longitude = user.getLongitude();
+				
+				WeatherData weatherData = new WeatherData(longitude, latitude);
+				Weather weather = weatherData.convertJSONObjectToWeather(weatherData.getTodaysWeatherDataTimeDependent(dayBefore), userId, dayBefore);
+				weather = weatherRepo.saveAndFlush(weather);
+				newPastMood.setWeatherId(weather.getWeatherId());
+			}
 			
 			// Get social activity - using MoodProveCronJob code to prevent repeating code
 			String fbToken = user.getFacebookAccessToken();
-			if (System.currentTimeMillis() > OAuthFacebook.getTokenExpirationTime(fbToken)) {
+			if (fbToken != null && System.currentTimeMillis() > OAuthFacebook.getTokenExpirationTime(fbToken)) {
 				Social social = moodProveCronJob.changeRecentSocialData(userId, null, dayBefore, fbToken);
 				newPastMood.setSocialId(social.getSocialid());
 			}
@@ -117,28 +121,37 @@ public class PredictedMoodRestController {
 			}
 			
 			// Get sleep activity - using MoodProveCronJob code to prevent repeating code
+			
+			// Adding getting events to sleepData block of code since token is shared for both
+			// types of data
 			SleepData sleepData = new SleepData(userId);
 			if (sleepData.isTokenValid()) {
 				Sleep sleepRecord = moodProveCronJob.changeRecentSleepData(userId, null, dayBefore, sleepData);
 				newPastMood.setSleepid(sleepRecord.getSleepId());
+				
+				// Get events
+				// timestamp == current time
+				String events = moodProveCronJob.findEventsForDay(userId, dayBefore, timestamp);
+				newPastMood.setEvents(events);
+				
 			}
 			else {
 				newPastMood.setSleepid("");
 			}
 			
-			// Get events
-			
-			// timestamp == current time
-			String events = moodProveCronJob.findEventsForDay(userId, dayBefore, timestamp);
-			newPastMood.setEvents(events);
-			
 			// Set mood/prediction
+			// adding quotation marks since the ML algorithm reads
+			// two words as two seperate words without the quotation marks
+			// removing %20, which marks a space in the given mood
+			mood = mood.replace("%20", " ");
+			mood = "\"" + mood + "\"";
 			newPastMood.setPrediction(mood);
 			
 			pastMoodRepo.saveAndFlush(newPastMood);
 			
-			u.setNewUserNextCheckInTime(timestamp + aDayInMilliseconds);
+			u.setNewUserNextCheckInTime((u.getNewUserNextCheckInTime()) + aDayInMilliseconds);
 			userRepo.saveAndFlush(u);
+		
 		}
 		
 		return "";
